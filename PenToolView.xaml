@@ -377,7 +377,7 @@
                                 MinWidth="200" MinHeight="150"
                                 Visibility="{Binding IsCanvasVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <Canvas x:Name="CanvasViewport" ClipToBounds="True" Background="Transparent"
-                          PreviewMouseWheel="CanvasViewport_PreviewMouseWheel"
+                            PreviewMouseWheel="CanvasViewport_PreviewMouseWheel"
                           PreviewMouseDown="CanvasViewport_PreviewMouseDown"
                           PreviewMouseMove="CanvasViewport_PreviewMouseMove"
                           MouseUp="CanvasViewport_MouseUp">
@@ -394,7 +394,6 @@
                                        DefaultDrawingAttributes="{Binding Pen, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                        EditingMode="{Binding EditingMode}"
                                        Background="#01FFFFFF"
-                                       local:InkCanvasEraser.Size="{Binding Source={x:Static local:PenSettings.Default},Path=EraserStyle.StrokeThickness,Mode=OneWay}"
                                        Strokes="{Binding Strokes}"
                                        SelectionChanged="InkCanvas_SelectionChanged"/>
                         </Grid>

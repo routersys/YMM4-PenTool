@@ -43,6 +43,9 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
                 ViewModel.FitToViewAction = FitCanvasToView;
             }
 
+            PenSettings.Default.EraserStyle.PropertyChanged += EraserStyle_PropertyChanged;
+            UpdateEraserShape();
+
             Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(FitCanvasToView));
         }
 
@@ -79,6 +82,7 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
             ViewModel?.SaveLayout(PenSettings.Default.Layout);
             base.OnClosing(e);
             SizeChanged -= PenToolView_SizeChanged;
+            PenSettings.Default.EraserStyle.PropertyChanged -= EraserStyle_PropertyChanged;
         }
 
         private void InitializePanels()
@@ -667,6 +671,20 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
             {
                 ViewModel.FilterSelection(inkCanvas.GetSelectedStrokes(), newSelection => inkCanvas.Select(newSelection));
             }
+        }
+
+        private void EraserStyle_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(EraserStyleSettings.StrokeThickness))
+            {
+                UpdateEraserShape();
+            }
+        }
+
+        private void UpdateEraserShape()
+        {
+            var size = PenSettings.Default.EraserStyle.StrokeThickness;
+            inkCanvas.EraserShape = new EllipseStylusShape(size, size);
         }
     }
 }
