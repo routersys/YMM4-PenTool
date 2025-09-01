@@ -6,6 +6,8 @@
 
 YMM4（YukkuriMovieMaker v4）の標準ペン機能を大幅に拡張し、より高度な描画を実現するための図形プラグインです。
 
+![image](https://github.com/routersys/YMM4-PenTool/blob/main/PenTool.png)
+
 ---
 
 ### 概要
