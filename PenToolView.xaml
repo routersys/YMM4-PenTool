@@ -378,14 +378,15 @@
                                 Visibility="{Binding IsCanvasVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <Canvas x:Name="CanvasViewport" ClipToBounds="True" Background="Transparent"
                             PreviewMouseWheel="CanvasViewport_PreviewMouseWheel"
-                          PreviewMouseDown="CanvasViewport_PreviewMouseDown"
-                          PreviewMouseMove="CanvasViewport_PreviewMouseMove"
-                          MouseUp="CanvasViewport_MouseUp">
+                            PreviewMouseDown="CanvasViewport_PreviewMouseDown"
+                            PreviewMouseMove="CanvasViewport_PreviewMouseMove"
+                            MouseUp="CanvasViewport_MouseUp">
                         <Grid x:Name="CanvasRoot" Width="{Binding CanvasSize.Width}" Height="{Binding CanvasSize.Height}"
-                              RenderTransformOrigin="0.0, 0.0">
+                              RenderTransformOrigin="0.5, 0.5">
                             <Grid.RenderTransform>
                                 <TransformGroup>
                                     <ScaleTransform ScaleX="{Binding CanvasScale}" ScaleY="{Binding CanvasScale}" />
+                                    <RotateTransform Angle="{Binding CanvasAngle}" />
                                     <TranslateTransform X="{Binding CanvasTranslateX}" Y="{Binding CanvasTranslateY}" />
                                 </TransformGroup>
                             </Grid.RenderTransform>
@@ -472,7 +473,7 @@
                 </ContentControl>
 
                 <ContentControl x:Name="CanvasControlPanel" Style="{StaticResource DraggablePanelStyle}" Tag="キャンバス操作"
-                                MinWidth="200" MinHeight="240" Width="200" Height="240"
+                                MinWidth="200" MinHeight="260" Width="200" Height="260"
                                 Visibility="{Binding IsCanvasControlPanelVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <local:CanvasControlPanelView/>
                 </ContentControl>

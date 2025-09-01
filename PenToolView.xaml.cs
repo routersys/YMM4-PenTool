@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Ink;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
@@ -62,13 +63,14 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
             double scaleY = viewportSize.Height / canvasSize.Height;
             double newScale = Math.Min(scaleX, scaleY);
 
+            newScale = Math.Max(0.1, newScale);
+            newScale = Math.Min(10.0, newScale);
+
             ViewModel.CanvasScale = newScale;
+            ViewModel.CanvasAngle = 0;
 
-            double newContentWidth = canvasSize.Width * newScale;
-            double newContentHeight = canvasSize.Height * newScale;
-
-            ViewModel.CanvasTranslateX = (viewportSize.Width - newContentWidth) / 2;
-            ViewModel.CanvasTranslateY = (viewportSize.Height - newContentHeight) / 2;
+            ViewModel.CanvasTranslateX = (viewportSize.Width - canvasSize.Width) / 2;
+            ViewModel.CanvasTranslateY = (viewportSize.Height - canvasSize.Height) / 2;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -595,23 +597,45 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
         private void HandleZoom(object sender, MouseWheelEventArgs e)
         {
             if (ViewModel == null) return;
-
             var viewport = sender as FrameworkElement;
             if (viewport == null) return;
 
             var position = e.GetPosition(viewport);
+
+            var oldScale = ViewModel.CanvasScale;
+            var angle = ViewModel.CanvasAngle;
+            var oldTranslateX = ViewModel.CanvasTranslateX;
+            var oldTranslateY = ViewModel.CanvasTranslateY;
+            var canvasCenter = new Point(ViewModel.CanvasSize.Width / 2, ViewModel.CanvasSize.Height / 2);
+
+            var transform = new Matrix();
+            transform.Translate(-canvasCenter.X, -canvasCenter.Y);
+            transform.Scale(oldScale, oldScale);
+            transform.Rotate(angle);
+            transform.Translate(canvasCenter.X, canvasCenter.Y);
+            transform.Translate(oldTranslateX, oldTranslateY);
+
+            transform.Invert();
+            var untransformedPos = transform.Transform(position);
+
             var scaleFactor = e.Delta > 0 ? 1.2 : 1.0 / 1.2;
+            var newScale = oldScale * scaleFactor;
+            newScale = Math.Clamp(newScale, 0.1, 10.0);
 
-            var targetScale = ViewModel.CanvasScale * scaleFactor;
-            targetScale = Math.Clamp(targetScale, 0.1, 10.0);
-            scaleFactor = targetScale / ViewModel.CanvasScale;
+            if (Math.Abs(newScale - oldScale) < 0.001) return;
 
-            if (Math.Abs(scaleFactor - 1.0) < 0.001) return;
+            var newTransformWithoutTranslate = new Matrix();
+            newTransformWithoutTranslate.Translate(-canvasCenter.X, -canvasCenter.Y);
+            newTransformWithoutTranslate.Scale(newScale, newScale);
+            newTransformWithoutTranslate.Rotate(angle);
+            newTransformWithoutTranslate.Translate(canvasCenter.X, canvasCenter.Y);
 
-            var newTranslateX = position.X - (position.X - ViewModel.CanvasTranslateX) * scaleFactor;
-            var newTranslateY = position.Y - (position.Y - ViewModel.CanvasTranslateY) * scaleFactor;
+            var newTransformedPos = newTransformWithoutTranslate.Transform(untransformedPos);
 
-            ViewModel.CanvasScale = targetScale;
+            var newTranslateX = position.X - newTransformedPos.X;
+            var newTranslateY = position.Y - newTransformedPos.Y;
+
+            ViewModel.CanvasScale = newScale;
             ViewModel.CanvasTranslateX = newTranslateX;
             ViewModel.CanvasTranslateY = newTranslateY;
 

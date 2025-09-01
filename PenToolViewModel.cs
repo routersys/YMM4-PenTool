@@ -175,6 +175,9 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
         public double CanvasScale { get => canvasScale; set => Set(ref canvasScale, Math.Clamp(value, 0.1, 10)); }
         private double canvasScale = 1.0;
 
+        public double CanvasAngle { get => canvasAngle; set => Set(ref canvasAngle, value); }
+        private double canvasAngle = 0;
+
         public double CanvasTranslateX { get => canvasTranslateX; set => Set(ref canvasTranslateX, value); }
         private double canvasTranslateX = 0;
 
@@ -186,6 +189,8 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
 
         public ICommand ZoomCommand { get; }
         public ActionCommand FitToViewCommand { get; }
+        public ICommand ResetRotationCommand { get; }
+
         private Action? _fitToViewAction;
         public Action? FitToViewAction
         {
@@ -279,6 +284,7 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
                 });
 
             FitToViewCommand = new ActionCommand(_ => FitToViewAction != null, _ => FitToViewAction?.Invoke());
+            ResetRotationCommand = new ActionCommand(_ => true, _ => CanvasAngle = 0);
 
             foreach (var layer in initialLayers)
             {
@@ -366,6 +372,11 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
             }
 
             _isFilteringSelection = false;
+        }
+
+        public void RotateCanvas(double angle)
+        {
+            CanvasAngle = angle;
         }
 
         public void PanCanvas(double dx, double dy)
@@ -456,12 +467,32 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
         {
             if (isUndoRedoing) return;
 
-            var removedStrokes = e.Removed.ToList();
+            var removedStrokesList = e.Removed.ToList();
             var addedStrokes = e.Added.ToList();
+
+            var isErasing = EditingMode == InkCanvasEditingMode.EraseByPoint || EditingMode == InkCanvasEditingMode.EraseByStroke;
+
+            if (isErasing && SelectedLayer != null)
+            {
+                var strokesToRestore = removedStrokesList
+                    .Where(s => !_strokeLayerMap.TryGetValue(s, out var layer) || layer != SelectedLayer)
+                    .ToList();
+
+                if (strokesToRestore.Any())
+                {
+                    isUndoRedoing = true;
+                    Strokes.Add(new StrokeCollection(strokesToRestore));
+                    isUndoRedoing = false;
+                }
+
+                removedStrokesList = removedStrokesList.Except(strokesToRestore).ToList();
+            }
+
+            if (!removedStrokesList.Any() && !addedStrokes.Any()) return;
 
             var affectedLayers = new HashSet<Layer.Layer>();
             var removedMap = new Dictionary<Layer.Layer, StrokeCollection>();
-            foreach (var stroke in removedStrokes)
+            foreach (var stroke in removedStrokesList)
             {
                 if (_strokeLayerMap.TryGetValue(stroke, out var layer))
                 {
@@ -484,7 +515,7 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
             {
                 isUndoRedoing = true;
                 Strokes.Remove(new StrokeCollection(addedStrokes));
-                Strokes.Add(new StrokeCollection(removedStrokes));
+                Strokes.Add(new StrokeCollection(removedStrokesList));
                 isUndoRedoing = false;
                 return;
             }
