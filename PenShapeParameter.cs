@@ -33,7 +33,7 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
         public bool IsEditing { get => isEditing; set => Set(ref isEditing, value); }
         private bool isEditing = false;
 
-        [Display(GroupName = " ", Name = "", Order = -1)]
+        [Display(GroupName = "Version Check Only", Name = "", Order = -1)]
         [UpdateCheckPanelEditor]
         public bool UpdateCheckPlaceholder { get; set; }
 

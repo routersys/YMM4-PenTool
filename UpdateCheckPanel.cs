@@ -18,7 +18,7 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen.Controls
         private static readonly HttpClient _httpClient = new();
         private static string _settingsFilePath = "";
         private static string _ignoredVersion = "";
-        private const string CurrentVersion = "1.0.0";
+        private const string CurrentVersion = "2.0.0";
 
         public event EventHandler? BeginEdit;
         public event EventHandler? EndEdit;

@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:YukkuriMovieMaker.Plugin.Community.Shape.Pen"
              mc:Ignorable="d" 
-             d:DesignHeight="220" d:DesignWidth="180"
+             d:DesignHeight="240" d:DesignWidth="180"
              d:DataContext="{d:DesignInstance Type=local:PenToolViewModel}">
     <UserControl.Resources>
         <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
@@ -24,17 +24,39 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" Margin="0,5,0,10" x:Name="JoystickArea" ClipToBounds="True">
-            <Border Width="100" Height="100" CornerRadius="50" Background="#FF4D4D4D" BorderBrush="#FF3C3C3C" BorderThickness="1"/>
+        <Grid Grid.Row="0" Margin="0,5,0,10" x:Name="JoystickArea" HorizontalAlignment="Center" VerticalAlignment="Center" Width="140" Height="140">
+
+            <Border Width="140" Height="140" CornerRadius="70" Background="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" BorderThickness="1"/>
+
+            <Canvas>
+                <Thumb x:Name="RotationKnob" Width="20" Height="20"
+                   DragStarted="RotationKnob_DragStarted"
+                   DragDelta="RotationKnob_DragDelta"
+                   DragCompleted="RotationKnob_DragCompleted">
+                    <Thumb.Template>
+                        <ControlTemplate TargetType="Thumb">
+                            <Grid>
+                                <Ellipse Fill="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}" Stroke="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" StrokeThickness="1"/>
+                            </Grid>
+                        </ControlTemplate>
+                    </Thumb.Template>
+                </Thumb>
+            </Canvas>
+
+            <Border Width="100" Height="100" CornerRadius="50" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" BorderThickness="1"/>
+
             <Thumb x:Name="JoystickKnob" Width="40" Height="40"
                    DragStarted="JoystickKnob_DragStarted"
                    DragDelta="JoystickKnob_DragDelta" 
                    DragCompleted="JoystickKnob_DragCompleted">
+                <Thumb.RenderTransform>
+                    <TranslateTransform x:Name="JoystickTransform"/>
+                </Thumb.RenderTransform>
                 <Thumb.Template>
                     <ControlTemplate TargetType="Thumb">
                         <Grid>
-                            <Ellipse Fill="#FF8A8A8A" Stroke="#FF3C3C3C" StrokeThickness="1"/>
-                            <Ellipse Margin="5" Fill="#FF6A6A6A" Stroke="#FF3C3C3C" StrokeThickness="1"/>
+                            <Ellipse Fill="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}" Stroke="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" StrokeThickness="1"/>
+                            <Ellipse Margin="5" Fill="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" Stroke="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" StrokeThickness="1"/>
                         </Grid>
                     </ControlTemplate>
                 </Thumb.Template>
@@ -47,14 +69,16 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
             <Button Grid.Column="0" ToolTip="全体表示" Command="{Binding FitToViewCommand}">
                 <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Stretch="Uniform" Width="16" Height="16" Data="M10,21V19H6.41L10.91,14.5L9.5,13.09L5,17.59V14H3V21H10M14.5,10.91L19,6.41V10H21V3H14V5H17.59L13.09,9.5L14.5,10.91Z" />
             </Button>
 
-            <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button ToolTip="回転をリセット" Command="{Binding ResetRotationCommand}" Width="24" Height="24">
+                    <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Stretch="Uniform" Width="16" Height="16" Data="M12,5V1L7,6L12,11V7C15.31,7 18,9.69 18,13C18,16.31 15.31,19 12,19C8.69,19 6,16.31 6,13H4C4,17.42 7.58,21 12,21C16.42,21 20,17.42 20,13C20,8.58 16.42,5 12,5Z" />
+                </Button>
                 <RepeatButton ToolTip="縮小" Command="{Binding ZoomCommand}" CommandParameter="Out" Width="24" Height="24">
                     <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RepeatButton}}" Stretch="Uniform" Width="12" Height="12" Data="M19,13H5V11H19V13Z" />
                 </RepeatButton>

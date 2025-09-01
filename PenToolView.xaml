@@ -10,8 +10,10 @@
         xmlns:controls="clr-namespace:YukkuriMovieMaker.Controls;assembly=YukkuriMovieMaker.Controls"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
-        Style="{DynamicResource CustomWindowStyle}"
-        Title="拡張ペンツール" Height="600" Width="1200"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Title="拡張ペンツール"
         d:DataContext="{d:DesignInstance Type={x:Type local:PenToolViewModel}}">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
@@ -21,6 +23,12 @@
         <Style TargetType="ListViewItem">
             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
             <Setter Property="Background" Value="Transparent"/>
+            <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ListViewItem_PreviewMouseLeftButtonDown" />
+            <EventSetter Event="Drop" Handler="ListViewItem_Drop" />
+            <EventSetter Event="MouseMove" Handler="ListViewItem_MouseMove" />
+            <EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick" />
+            <EventSetter Event="DragOver" Handler="ListViewItem_DragOver" />
+            <EventSetter Event="DragLeave" Handler="ListViewItem_DragLeave" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ListViewItem">
@@ -81,14 +89,14 @@
                                     <ContentPresenter Grid.Row="1"/>
                                 </Grid>
                             </Border>
-                            <Thumb x:Name="ResizeTop" Cursor="SizeNS" Height="4" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
-                            <Thumb x:Name="ResizeBottom" Cursor="SizeNS" Height="4" VerticalAlignment="Bottom" HorizontalAlignment="Stretch"/>
-                            <Thumb x:Name="ResizeLeft" Cursor="SizeWE" Width="4" HorizontalAlignment="Left" VerticalAlignment="Stretch"/>
-                            <Thumb x:Name="ResizeRight" Cursor="SizeWE" Width="4" HorizontalAlignment="Right" VerticalAlignment="Stretch"/>
-                            <Thumb x:Name="ResizeTopLeft" Cursor="SizeNWSE" Width="8" Height="8" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                            <Thumb x:Name="ResizeTopRight" Cursor="SizeNESW" Width="8" Height="8" VerticalAlignment="Top" HorizontalAlignment="Right"/>
-                            <Thumb x:Name="ResizeBottomLeft" Cursor="SizeNESW" Width="8" Height="8" VerticalAlignment="Bottom" HorizontalAlignment="Left"/>
-                            <Thumb x:Name="ResizeBottomRight" Cursor="SizeNWSE" Width="8" Height="8" VerticalAlignment="Bottom" HorizontalAlignment="Right"/>
+                            <Thumb x:Name="ResizeTop" Cursor="SizeNS" Height="4" VerticalAlignment="Top" HorizontalAlignment="Stretch" DragCompleted="ResizeThumb_DragCompleted"/>
+                            <Thumb x:Name="ResizeBottom" Cursor="SizeNS" Height="4" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" DragCompleted="ResizeThumb_DragCompleted"/>
+                            <Thumb x:Name="ResizeLeft" Cursor="SizeWE" Width="4" HorizontalAlignment="Left" VerticalAlignment="Stretch" DragCompleted="ResizeThumb_DragCompleted"/>
+                            <Thumb x:Name="ResizeRight" Cursor="SizeWE" Width="4" HorizontalAlignment="Right" VerticalAlignment="Stretch" DragCompleted="ResizeThumb_DragCompleted"/>
+                            <Thumb x:Name="ResizeTopLeft" Cursor="SizeNWSE" Width="8" Height="8" VerticalAlignment="Top" HorizontalAlignment="Left" DragCompleted="ResizeThumb_DragCompleted"/>
+                            <Thumb x:Name="ResizeTopRight" Cursor="SizeNESW" Width="8" Height="8" VerticalAlignment="Top" HorizontalAlignment="Right" DragCompleted="ResizeThumb_DragCompleted"/>
+                            <Thumb x:Name="ResizeBottomLeft" Cursor="SizeNESW" Width="8" Height="8" VerticalAlignment="Bottom" HorizontalAlignment="Left" DragCompleted="ResizeThumb_DragCompleted"/>
+                            <Thumb x:Name="ResizeBottomRight" Cursor="SizeNWSE" Width="8" Height="8" VerticalAlignment="Bottom" HorizontalAlignment="Right" DragCompleted="ResizeThumb_DragCompleted"/>
                         </Grid>
                     </ControlTemplate>
                 </Setter.Value>
@@ -176,309 +184,403 @@
             <Setter Property="Height" Value="Auto"/>
         </Style>
 
+        <Style x:Key="WindowButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Width" Value="46"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#E5E5E5"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#CACACB"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="CloseButtonStyle" TargetType="Button" BasedOn="{StaticResource WindowButtonStyle}">
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#E81123"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#F1707A"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
     </Window.Resources>
     <Window.InputBindings>
         <KeyBinding Modifiers="Ctrl" Key="Z" Command="{Binding UndoCommand}"/>
         <KeyBinding Modifiers="Ctrl" Key="Y" Command="{Binding RedoCommand}"/>
         <KeyBinding Modifiers="Ctrl+Shift" Key="Z" Command="{Binding RedoCommand}"/>
     </Window.InputBindings>
-    <DockPanel>
-        <Menu DockPanel.Dock="Top">
-            <MenuItem Header="表示(_V)">
-                <MenuItem Header="キャンバス" IsChecked="{Binding IsCanvasVisible}" Command="{Binding TogglePanelVisibilityCommand}" CommandParameter="CanvasPanel"/>
-                <MenuItem Header="レイヤー" IsChecked="{Binding IsLayersVisible}" Command="{Binding TogglePanelVisibilityCommand}" CommandParameter="LayersPanel"/>
-                <MenuItem Header="キャンバス操作" IsChecked="{Binding IsCanvasControlPanelVisible}" Command="{Binding TogglePanelVisibilityCommand}" CommandParameter="CanvasControlPanel"/>
-            </MenuItem>
-            <MenuItem Header="設定(_S)">
-                <MenuItem Header="マウスホイールの動作">
-                    <MenuItem Header="キャンバスの拡大・縮小" IsCheckable="True" IsChecked="{Binding Source={x:Static local:PenSettings.Default}, Path=MouseWheelAction, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:MouseWheelAction.Zoom}}"/>
-                    <MenuItem Header="ペンサイズの変更" IsCheckable="True" IsChecked="{Binding Source={x:Static local:PenSettings.Default}, Path=MouseWheelAction, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:MouseWheelAction.PenSize}}"/>
-                </MenuItem>
-                <MenuItem Header="ツールバーのレイアウト">
-                    <MenuItem Header="上" IsCheckable="True" IsChecked="{Binding ToolbarLayout, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:ToolbarLayout.Top}}"/>
-                    <MenuItem Header="下" IsCheckable="True" IsChecked="{Binding ToolbarLayout, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:ToolbarLayout.Bottom}}"/>
-                    <MenuItem Header="左" IsCheckable="True" IsChecked="{Binding ToolbarLayout, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:ToolbarLayout.Left}}"/>
-                    <MenuItem Header="右" IsCheckable="True" IsChecked="{Binding ToolbarLayout, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:ToolbarLayout.Right}}"/>
-                </MenuItem>
-            </MenuItem>
-        </Menu>
-
-        <Border DockPanel.Dock="Bottom" BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" BorderThickness="0,1,0,0" Padding="4">
-            <Button Content="閉じる" Width="100" HorizontalAlignment="Right" Click="Button_Click"/>
-        </Border>
-
+    <Border BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" BorderThickness="1" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}">
         <DockPanel>
-            <Border BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" Padding="4">
-                <Border.Style>
-                    <Style TargetType="Border">
-                        <Setter Property="DockPanel.Dock" Value="Top"/>
-                        <Setter Property="BorderThickness" Value="0,0,0,1"/>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding ToolbarLayout}" Value="{x:Static local:ToolbarLayout.Bottom}">
-                                <Setter Property="DockPanel.Dock" Value="Bottom"/>
-                                <Setter Property="BorderThickness" Value="0,1,0,0"/>
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding ToolbarLayout}" Value="{x:Static local:ToolbarLayout.Left}">
-                                <Setter Property="DockPanel.Dock" Value="Left"/>
-                                <Setter Property="BorderThickness" Value="0,0,1,0"/>
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding ToolbarLayout}" Value="{x:Static local:ToolbarLayout.Right}">
-                                <Setter Property="DockPanel.Dock" Value="Right"/>
-                                <Setter Property="BorderThickness" Value="1,0,0,0"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Border.Style>
-                <StackPanel>
-                    <StackPanel.Style>
-                        <Style TargetType="StackPanel">
-                            <Setter Property="Orientation" Value="Horizontal"/>
+            <Grid DockPanel.Dock="Top" Height="32" Background="Transparent" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="{Binding Title, RelativeSource={RelativeSource AncestorType=Window}}" VerticalAlignment="Center" Margin="10,0,0,0" Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" MouseLeftButtonDown="ProtectedArea_MouseLeftButtonDown"/>
+
+                <Menu Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Background="Transparent" Margin="10,0,0,0" MouseLeftButtonDown="ProtectedArea_MouseLeftButtonDown">
+                    <MenuItem Header="表示(_V)">
+                        <MenuItem Header="キャンバス" IsChecked="{Binding IsCanvasVisible}" Command="{Binding TogglePanelVisibilityCommand}" CommandParameter="CanvasPanel"/>
+                        <MenuItem Header="レイヤー" IsChecked="{Binding IsLayersVisible}" Command="{Binding TogglePanelVisibilityCommand}" CommandParameter="LayersPanel"/>
+                        <MenuItem Header="キャンバス操作" IsChecked="{Binding IsCanvasControlPanelVisible}" Command="{Binding TogglePanelVisibilityCommand}" CommandParameter="CanvasControlPanel"/>
+                    </MenuItem>
+                    <MenuItem Header="設定(_S)">
+                        <MenuItem Header="マウスホイールの動作">
+                            <MenuItem Header="キャンバスの拡大・縮小" IsCheckable="True" IsChecked="{Binding Source={x:Static local:PenSettings.Default}, Path=MouseWheelAction, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:MouseWheelAction.Zoom}}"/>
+                            <MenuItem Header="ペンサイズの変更" IsCheckable="True" IsChecked="{Binding Source={x:Static local:PenSettings.Default}, Path=MouseWheelAction, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:MouseWheelAction.PenSize}}"/>
+                        </MenuItem>
+                        <MenuItem Header="ツールバーのレイアウト">
+                            <MenuItem Header="上" IsCheckable="True" IsChecked="{Binding ToolbarLayout, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:ToolbarLayout.Top}}"/>
+                            <MenuItem Header="下" IsCheckable="True" IsChecked="{Binding ToolbarLayout, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:ToolbarLayout.Bottom}}"/>
+                            <MenuItem Header="左" IsCheckable="True" IsChecked="{Binding ToolbarLayout, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:ToolbarLayout.Left}}"/>
+                            <MenuItem Header="右" IsCheckable="True" IsChecked="{Binding ToolbarLayout, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:ToolbarLayout.Right}}"/>
+                        </MenuItem>
+                    </MenuItem>
+                </Menu>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <Button Style="{StaticResource WindowButtonStyle}" Click="MinimizeButton_Click">
+                        <Path Data="M0 5 H10" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.5" Width="10" Height="10"/>
+                    </Button>
+                    <Button Style="{StaticResource CloseButtonStyle}" Click="Button_Click">
+                        <Path Data="M0 0 L10 10 M0 10 L10 0" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.5" Width="10" Height="10"/>
+                    </Button>
+                </StackPanel>
+            </Grid>
+
+            <Border DockPanel.Dock="Bottom" BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" BorderThickness="0,1,0,0" Padding="4">
+                <Button Content="閉じる" Width="100" HorizontalAlignment="Right" Click="Button_Click"/>
+            </Border>
+
+            <DockPanel>
+                <Border BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" Padding="4">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="DockPanel.Dock" Value="Top"/>
+                            <Setter Property="BorderThickness" Value="0,0,0,1"/>
                             <Style.Triggers>
+                                <DataTrigger Binding="{Binding ToolbarLayout}" Value="{x:Static local:ToolbarLayout.Bottom}">
+                                    <Setter Property="DockPanel.Dock" Value="Bottom"/>
+                                    <Setter Property="BorderThickness" Value="0,1,0,0"/>
+                                </DataTrigger>
                                 <DataTrigger Binding="{Binding ToolbarLayout}" Value="{x:Static local:ToolbarLayout.Left}">
-                                    <Setter Property="Orientation" Value="Vertical"/>
+                                    <Setter Property="DockPanel.Dock" Value="Left"/>
+                                    <Setter Property="BorderThickness" Value="0,0,1,0"/>
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding ToolbarLayout}" Value="{x:Static local:ToolbarLayout.Right}">
-                                    <Setter Property="Orientation" Value="Vertical"/>
+                                    <Setter Property="DockPanel.Dock" Value="Right"/>
+                                    <Setter Property="BorderThickness" Value="1,0,0,0"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
-                    </StackPanel.Style>
-
-                    <RadioButton Content="{DynamicResource pen}" ToolTip="ペン (右クリックで設定)" IsChecked="{Binding SelectedBrushType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static brush:BrushType.Pen}}" GroupName="ToolSelection">
-                        <RadioButton.ContextMenu>
-                            <ContextMenu>
-                                <MenuItem Header="筆圧" IsCheckable="True" IsChecked="{Binding Source={x:Static local:PenSettings.Default}, Path=PenStyle.IsPressure, Mode=TwoWay}"/>
-                            </ContextMenu>
-                        </RadioButton.ContextMenu>
-                    </RadioButton>
-                    <RadioButton Content="{DynamicResource marker}" ToolTip="マーカー (右クリックで設定)" IsChecked="{Binding SelectedBrushType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static brush:BrushType.Highlighter}}" GroupName="ToolSelection">
-                        <RadioButton.ContextMenu>
-                            <ContextMenu>
-                                <MenuItem Header="筆圧" IsCheckable="True" IsChecked="{Binding Source={x:Static local:PenSettings.Default}, Path=HighlighterStyle.IsPressure, Mode=TwoWay}"/>
-                            </ContextMenu>
-                        </RadioButton.ContextMenu>
-                    </RadioButton>
-                    <RadioButton Content="{DynamicResource pencil}" ToolTip="鉛筆 (右クリックで設定)" IsChecked="{Binding SelectedBrushType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static brush:BrushType.Pencil}}" GroupName="ToolSelection">
-                        <RadioButton.ContextMenu>
-                            <ContextMenu>
-                                <MenuItem Header="筆圧" IsCheckable="True" IsChecked="{Binding Source={x:Static local:PenSettings.Default}, Path=PencilStyle.IsPressure, Mode=TwoWay}"/>
-                            </ContextMenu>
-                        </RadioButton.ContextMenu>
-                    </RadioButton>
-                    <RadioButton Content="{DynamicResource eraser}" ToolTip="消しゴム (右クリックでモード切替)" IsChecked="{Binding SelectedBrushType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static brush:BrushType.Eraser}}" GroupName="ToolSelection">
-                        <RadioButton.ContextMenu>
-                            <ContextMenu>
-                                <MenuItem Header="ポイント消し" IsChecked="{Binding Source={x:Static local:PenSettings.Default}, Path=EraserStyle.Mode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:EraserMode.Point}}"
-                                          Command="{Binding SwitchEraserModeCommand}" CommandParameter="{x:Static local:EraserMode.Point}"/>
-                                <MenuItem Header="ストローク消し" IsChecked="{Binding Source={x:Static local:PenSettings.Default}, Path=EraserStyle.Mode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:EraserMode.Line}}"
-                                          Command="{Binding SwitchEraserModeCommand}" CommandParameter="{x:Static local:EraserMode.Line}"/>
-                            </ContextMenu>
-                        </RadioButton.ContextMenu>
-                    </RadioButton>
-                    <Separator>
-                        <Separator.Style>
-                            <Style TargetType="Separator">
-                                <Setter Property="Margin" Value="5,0"/>
+                    </Border.Style>
+                    <StackPanel>
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Orientation" Value="Horizontal"/>
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding ToolbarLayout}" Value="{x:Static local:ToolbarLayout.Left}">
-                                        <Setter Property="Margin" Value="0,5"/>
+                                        <Setter Property="Orientation" Value="Vertical"/>
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding ToolbarLayout}" Value="{x:Static local:ToolbarLayout.Right}">
-                                        <Setter Property="Margin" Value="0,5"/>
+                                        <Setter Property="Orientation" Value="Vertical"/>
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
-                        </Separator.Style>
-                    </Separator>
+                        </StackPanel.Style>
 
-                    <RadioButton Content="{DynamicResource lasso}" ToolTip="選択" IsChecked="{Binding IsSelectMode, Mode=TwoWay}" GroupName="ToolSelection"/>
-                    <RepeatButton Content="{DynamicResource Undo}" ToolTip="元に戻す (Ctrl+Z)" Command="{Binding UndoCommand}"/>
-                    <RepeatButton Content="{DynamicResource Redo}" ToolTip="やり直し (Ctrl+Y)" Command="{Binding RedoCommand}"/>
+                        <RadioButton Content="{DynamicResource pen}" ToolTip="ペン (右クリックで設定)" IsChecked="{Binding SelectedBrushType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static brush:BrushType.Pen}}" GroupName="ToolSelection">
+                            <RadioButton.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="筆圧" IsCheckable="True" IsChecked="{Binding Source={x:Static local:PenSettings.Default}, Path=PenStyle.IsPressure, Mode=TwoWay}"/>
+                                </ContextMenu>
+                            </RadioButton.ContextMenu>
+                        </RadioButton>
+                        <RadioButton Content="{DynamicResource marker}" ToolTip="マーカー (右クリックで設定)" IsChecked="{Binding SelectedBrushType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static brush:BrushType.Highlighter}}" GroupName="ToolSelection">
+                            <RadioButton.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="筆圧" IsCheckable="True" IsChecked="{Binding Source={x:Static local:PenSettings.Default}, Path=HighlighterStyle.IsPressure, Mode=TwoWay}"/>
+                                </ContextMenu>
+                            </RadioButton.ContextMenu>
+                        </RadioButton>
+                        <RadioButton Content="{DynamicResource pencil}" ToolTip="鉛筆 (右クリックで設定)" IsChecked="{Binding SelectedBrushType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static brush:BrushType.Pencil}}" GroupName="ToolSelection">
+                            <RadioButton.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="筆圧" IsCheckable="True" IsChecked="{Binding Source={x:Static local:PenSettings.Default}, Path=PencilStyle.IsPressure, Mode=TwoWay}"/>
+                                </ContextMenu>
+                            </RadioButton.ContextMenu>
+                        </RadioButton>
+                        <RadioButton Content="{DynamicResource eraser}" ToolTip="消しゴム (右クリックでモード切替)" IsChecked="{Binding SelectedBrushType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static brush:BrushType.Eraser}}" GroupName="ToolSelection">
+                            <RadioButton.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="ポイント消し" IsChecked="{Binding Source={x:Static local:PenSettings.Default}, Path=EraserStyle.Mode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:EraserMode.Point}}"
+                                              Command="{Binding SwitchEraserModeCommand}" CommandParameter="{x:Static local:EraserMode.Point}"/>
+                                    <MenuItem Header="ストローク消し" IsChecked="{Binding Source={x:Static local:PenSettings.Default}, Path=EraserStyle.Mode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static local:EraserMode.Line}}"
+                                              Command="{Binding SwitchEraserModeCommand}" CommandParameter="{x:Static local:EraserMode.Line}"/>
+                                </ContextMenu>
+                            </RadioButton.ContextMenu>
+                        </RadioButton>
+                        <Separator>
+                            <Separator.Style>
+                                <Style TargetType="Separator">
+                                    <Setter Property="Margin" Value="5,0"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ToolbarLayout}" Value="{x:Static local:ToolbarLayout.Left}">
+                                            <Setter Property="Margin" Value="0,5"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding ToolbarLayout}" Value="{x:Static local:ToolbarLayout.Right}">
+                                            <Setter Property="Margin" Value="0,5"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Separator.Style>
+                        </Separator>
 
-                    <Separator>
-                        <Separator.Style>
-                            <Style TargetType="Separator">
-                                <Setter Property="Margin" Value="5,0"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ToolbarLayout}" Value="{x:Static local:ToolbarLayout.Left}">
-                                        <Setter Property="Margin" Value="0,5"/>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding ToolbarLayout}" Value="{x:Static local:ToolbarLayout.Right}">
-                                        <Setter Property="Margin" Value="0,5"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Separator.Style>
-                    </Separator>
+                        <RadioButton Content="{DynamicResource lasso}" ToolTip="選択" IsChecked="{Binding IsSelectMode, Mode=TwoWay}" GroupName="ToolSelection"/>
+                        <RepeatButton Content="{DynamicResource Undo}" ToolTip="元に戻す (Ctrl+Z)" Command="{Binding UndoCommand}"/>
+                        <RepeatButton Content="{DynamicResource Redo}" ToolTip="やり直し (Ctrl+Y)" Command="{Binding RedoCommand}"/>
 
-                    <controls:ColorPicker Value="{Binding StrokeColor, Mode=TwoWay}" IsEnabled="{Binding IsColorPickerEnabled}">
-                        <controls:ColorPicker.Style>
-                            <Style TargetType="controls:ColorPicker">
-                                <Setter Property="Width" Value="100"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ToolbarLayout}" Value="{x:Static local:ToolbarLayout.Left}">
-                                        <Setter Property="Width" Value="40"/>
-                                        <Setter Property="Height" Value="40"/>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding ToolbarLayout}" Value="{x:Static local:ToolbarLayout.Right}">
-                                        <Setter Property="Width" Value="40"/>
-                                        <Setter Property="Height" Value="40"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </controls:ColorPicker.Style>
-                    </controls:ColorPicker>
-                    <controls:TextBoxSlider Value="{Binding StrokeThickness, Mode=TwoWay}" Min="0.1" Max="1024" DefaultMin="0.1" DefaultMax="100">
-                        <controls:TextBoxSlider.Style>
-                            <Style TargetType="controls:TextBoxSlider">
-                                <Setter Property="Width" Value="150"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ToolbarLayout}" Value="{x:Static local:ToolbarLayout.Left}">
-                                        <Setter Property="Width" Value="Auto"/>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding ToolbarLayout}" Value="{x:Static local:ToolbarLayout.Right}">
-                                        <Setter Property="Width" Value="Auto"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </controls:TextBoxSlider.Style>
-                    </controls:TextBoxSlider>
+                        <Separator>
+                            <Separator.Style>
+                                <Style TargetType="Separator">
+                                    <Setter Property="Margin" Value="5,0"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ToolbarLayout}" Value="{x:Static local:ToolbarLayout.Left}">
+                                            <Setter Property="Margin" Value="0,5"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding ToolbarLayout}" Value="{x:Static local:ToolbarLayout.Right}">
+                                            <Setter Property="Margin" Value="0,5"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Separator.Style>
+                        </Separator>
 
-                    <Separator>
-                        <Separator.Style>
-                            <Style TargetType="Separator">
-                                <Setter Property="Margin" Value="5,0"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ToolbarLayout}" Value="{x:Static local:ToolbarLayout.Left}">
-                                        <Setter Property="Margin" Value="0,5"/>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding ToolbarLayout}" Value="{x:Static local:ToolbarLayout.Right}">
-                                        <Setter Property="Margin" Value="0,5"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Separator.Style>
-                    </Separator>
+                        <controls:ColorPicker Value="{Binding StrokeColor, Mode=TwoWay}" IsEnabled="{Binding IsColorPickerEnabled}">
+                            <controls:ColorPicker.Style>
+                                <Style TargetType="controls:ColorPicker">
+                                    <Setter Property="Width" Value="100"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ToolbarLayout}" Value="{x:Static local:ToolbarLayout.Left}">
+                                            <Setter Property="Width" Value="40"/>
+                                            <Setter Property="Height" Value="40"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding ToolbarLayout}" Value="{x:Static local:ToolbarLayout.Right}">
+                                            <Setter Property="Width" Value="40"/>
+                                            <Setter Property="Height" Value="40"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </controls:ColorPicker.Style>
+                        </controls:ColorPicker>
 
-                    <Button Content="{DynamicResource import}" ToolTip="インポート" Command="{Binding ImportIsfCommand}"/>
-                    <controls:DropDownButton Content="{DynamicResource export}" ToolTip="エクスポート">
-                        <controls:DropDownButton.ContextMenu>
-                            <ContextMenu DataContext="{Binding RelativeSource={RelativeSource Mode=Self},Path=PlacementTarget.DataContext}" d:DataContext="{d:DesignInstance Type={x:Type local:PenToolViewModel}}">
-                                <MenuItem Header="画像として保存" Command="{Binding SaveImageCommand}"/>
-                                <MenuItem Header="ISF形式でエクスポート" Command="{Binding ExportIsfCommand}" />
-                            </ContextMenu>
-                        </controls:DropDownButton.ContextMenu>
-                    </controls:DropDownButton>
-                </StackPanel>
-            </Border>
-
-            <Canvas x:Name="MainCanvas" ClipToBounds="True">
-                <ContentControl x:Name="CanvasPanel" Style="{StaticResource DraggablePanelStyle}" Tag="キャンバス" 
-                                MinWidth="200" MinHeight="150"
-                                Visibility="{Binding IsCanvasVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <Canvas x:Name="CanvasViewport" ClipToBounds="True" Background="Transparent"
-                            PreviewMouseWheel="CanvasViewport_PreviewMouseWheel"
-                            PreviewMouseDown="CanvasViewport_PreviewMouseDown"
-                            PreviewMouseMove="CanvasViewport_PreviewMouseMove"
-                            MouseUp="CanvasViewport_MouseUp">
-                        <Grid x:Name="CanvasRoot" Width="{Binding CanvasSize.Width}" Height="{Binding CanvasSize.Height}"
-                              RenderTransformOrigin="0.5, 0.5">
-                            <Grid.RenderTransform>
-                                <TransformGroup>
-                                    <ScaleTransform ScaleX="{Binding CanvasScale}" ScaleY="{Binding CanvasScale}" />
-                                    <RotateTransform Angle="{Binding CanvasAngle}" />
-                                    <TranslateTransform X="{Binding CanvasTranslateX}" Y="{Binding CanvasTranslateY}" />
-                                </TransformGroup>
-                            </Grid.RenderTransform>
-                            <Image Source="{Binding Bitmap}" Name="image"/>
-                            <InkCanvas Name="inkCanvas"
-                                       DefaultDrawingAttributes="{Binding Pen, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                       EditingMode="{Binding EditingMode}"
-                                       Background="#01FFFFFF"
-                                       Strokes="{Binding Strokes}"
-                                       SelectionChanged="InkCanvas_SelectionChanged"/>
+                        <Grid>
+                            <controls:TextBoxSlider Value="{Binding StrokeThickness, Mode=TwoWay}" Min="0.1" Max="1024" DefaultMin="0.1" DefaultMax="100" Width="150">
+                                <controls:TextBoxSlider.Style>
+                                    <Style TargetType="controls:TextBoxSlider">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ToolbarLayout}" Value="{x:Static local:ToolbarLayout.Left}">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding ToolbarLayout}" Value="{x:Static local:ToolbarLayout.Right}">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </controls:TextBoxSlider.Style>
+                            </controls:TextBoxSlider>
+                            <StackPanel Height="150">
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ToolbarLayout}" Value="{x:Static local:ToolbarLayout.Left}">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding ToolbarLayout}" Value="{x:Static local:ToolbarLayout.Right}">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+                                <TextBox Text="{Binding StrokeThickness, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=F1}" HorizontalContentAlignment="Center" MinWidth="40"/>
+                                <Slider Value="{Binding StrokeThickness, Mode=TwoWay}" Minimum="0.1" Maximum="1024" Orientation="Vertical" HorizontalAlignment="Center" Height="120" />
+                            </StackPanel>
                         </Grid>
-                    </Canvas>
-                </ContentControl>
 
-                <ContentControl x:Name="LayersPanel" Style="{StaticResource DraggablePanelStyle}" Tag="レイヤー" 
-                                MinWidth="200" MinHeight="200"
-                                Visibility="{Binding IsLayersVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition/>
-                            <RowDefinition Height="30"/>
-                        </Grid.RowDefinitions>
+                        <Separator>
+                            <Separator.Style>
+                                <Style TargetType="Separator">
+                                    <Setter Property="Margin" Value="5,0"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ToolbarLayout}" Value="{x:Static local:ToolbarLayout.Left}">
+                                            <Setter Property="Margin" Value="0,5"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding ToolbarLayout}" Value="{x:Static local:ToolbarLayout.Right}">
+                                            <Setter Property="Margin" Value="0,5"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Separator.Style>
+                        </Separator>
 
-                        <ListView Grid.Row="0" ItemsSource="{Binding Layers}" SelectedItem="{Binding SelectedLayer}" BorderThickness="0" HorizontalContentAlignment="Stretch" Background="Transparent">
-                            <ListView.ItemTemplate>
-                                <DataTemplate DataType="{x:Type layer:Layer}">
-                                    <Border BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" BorderThickness="0,0,0,1" Padding="5">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto"/>
-                                                <ColumnDefinition Width="Auto"/>
-                                                <ColumnDefinition/>
-                                                <ColumnDefinition Width="Auto"/>
-                                            </Grid.ColumnDefinitions>
+                        <Button Content="{DynamicResource import}" ToolTip="インポート" Command="{Binding ImportIsfCommand}"/>
+                        <controls:DropDownButton Content="{DynamicResource export}" ToolTip="エクスポート">
+                            <controls:DropDownButton.ContextMenu>
+                                <ContextMenu DataContext="{Binding RelativeSource={RelativeSource Mode=Self},Path=PlacementTarget.DataContext}" d:DataContext="{d:DesignInstance Type={x:Type local:PenToolViewModel}}">
+                                    <MenuItem Header="画像として保存" Command="{Binding SaveImageCommand}"/>
+                                    <MenuItem Header="ISF形式でエクスポート" Command="{Binding ExportIsfCommand}" />
+                                </ContextMenu>
+                            </controls:DropDownButton.ContextMenu>
+                        </controls:DropDownButton>
+                    </StackPanel>
+                </Border>
 
-                                            <CheckBox Grid.Column="0" IsChecked="{Binding IsVisible}" VerticalAlignment="Center" Margin="0,0,5,0">
-                                                <CheckBox.Template>
-                                                    <ControlTemplate TargetType="CheckBox">
-                                                        <Grid>
-                                                            <Path x:Name="EyeIcon" Style="{StaticResource IconPathStyle}" Data="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,4.5C17,4.5 21.27,7.61 23,12C21.27,16.39 17,19.5 12,19.5C7,19.5 2.73,16.39 1,12C2.73,7.61 7,4.5 12,4.5M12,6.5A5.5,5.5 0 0,0 6.5,12A5.5,5.5 0 0,0 12,17.5A5.5,5.5 0 0,0 17.5,12A5.5,5.5 0 0,0 12,6.5Z"
-                                                                  Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ListViewItem}}"/>
-                                                        </Grid>
-                                                        <ControlTemplate.Triggers>
-                                                            <Trigger Property="IsChecked" Value="False">
-                                                                <Setter TargetName="EyeIcon" Property="Opacity" Value="0.2"/>
-                                                            </Trigger>
-                                                        </ControlTemplate.Triggers>
-                                                    </ControlTemplate>
-                                                </CheckBox.Template>
-                                            </CheckBox>
+                <Canvas x:Name="MainCanvas" ClipToBounds="True">
+                    <ContentControl x:Name="CanvasPanel" Style="{StaticResource DraggablePanelStyle}" Tag="キャンバス" 
+                                    MinWidth="200" MinHeight="150"
+                                    Visibility="{Binding IsCanvasVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Canvas x:Name="CanvasViewport" ClipToBounds="True" Background="Transparent"
+                                PreviewMouseWheel="CanvasViewport_PreviewMouseWheel"
+                                PreviewMouseDown="CanvasViewport_PreviewMouseDown"
+                                PreviewMouseMove="CanvasViewport_PreviewMouseMove"
+                                MouseUp="CanvasViewport_MouseUp"
+                                MouseEnter="CanvasViewport_MouseEnter"
+                                MouseLeave="CanvasViewport_MouseLeave">
+                            <Grid x:Name="CanvasRoot" Width="{Binding CanvasSize.Width}" Height="{Binding CanvasSize.Height}"
+                                  RenderTransformOrigin="0.5, 0.5">
+                                <Grid.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleX="{Binding CanvasScale}" ScaleY="{Binding CanvasScale}" />
+                                        <RotateTransform Angle="{Binding CanvasAngle}" />
+                                        <TranslateTransform X="{Binding CanvasTranslateX}" Y="{Binding CanvasTranslateY}" />
+                                    </TransformGroup>
+                                </Grid.RenderTransform>
+                                <Image Source="{Binding Bitmap}" Name="image"/>
+                                <InkCanvas Name="inkCanvas"
+                                           UseCustomCursor="True"
+                                           DefaultDrawingAttributes="{Binding Pen, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                           EditingMode="{Binding EditingMode}"
+                                           Background="#01FFFFFF"
+                                           Strokes="{Binding Strokes}"
+                                           SelectionChanged="InkCanvas_SelectionChanged"/>
+                            </Grid>
+                            <Ellipse x:Name="PenPreview" IsHitTestVisible="False" Visibility="Collapsed" StrokeThickness="1" Stroke="Black"/>
+                            <Rectangle x:Name="PenPreviewRectangle" IsHitTestVisible="False" Visibility="Collapsed" StrokeThickness="1" Stroke="Black"/>
+                        </Canvas>
+                    </ContentControl>
 
-                                            <Border Grid.Column="1" Width="48" Height="27" BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" BorderThickness="1" Margin="5,0" VerticalAlignment="Center">
-                                                <Image Source="{Binding Thumbnail}" Stretch="Uniform"/>
+                    <ContentControl x:Name="LayersPanel" Style="{StaticResource DraggablePanelStyle}" Tag="レイヤー" 
+                                    MinWidth="200" MinHeight="200"
+                                    Visibility="{Binding IsLayersVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition Height="30"/>
+                            </Grid.RowDefinitions>
+
+                            <ListView Grid.Row="0" ItemsSource="{Binding Layers}" SelectedItem="{Binding SelectedLayer}" BorderThickness="0" HorizontalContentAlignment="Stretch" Background="Transparent" AllowDrop="True">
+                                <ListView.Resources>
+                                    <Style TargetType="Border" x:Key="DragDropIndicator">
+                                        <Setter Property="BorderBrush" Value="DodgerBlue" />
+                                        <Setter Property="BorderThickness" Value="0,2,0,0" />
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </Style>
+                                </ListView.Resources>
+                                <ListView.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type layer:Layer}">
+                                        <StackPanel>
+                                            <Border x:Name="DropIndicator" Style="{StaticResource DragDropIndicator}" />
+                                            <Border BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" BorderThickness="0,0,0,1" Padding="5">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <CheckBox Grid.Column="0" IsChecked="{Binding IsVisible}" VerticalAlignment="Center" Margin="0,0,5,0"
+                                                              PreviewMouseLeftButtonDown="CheckBox_PreviewMouseLeftButtonDown">
+                                                        <CheckBox.Template>
+                                                            <ControlTemplate TargetType="CheckBox">
+                                                                <Grid>
+                                                                    <Path x:Name="EyeIcon" Style="{StaticResource IconPathStyle}" Data="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,4.5C17,4.5 21.27,7.61 23,12C21.27,16.39 17,19.5 12,19.5C7,19.5 2.73,16.39 1,12C2.73,7.61 7,4.5 12,4.5M12,6.5A5.5,5.5 0 0,0 6.5,12A5.5,5.5 0 0,0 12,17.5A5.5,5.5 0 0,0 17.5,12A5.5,5.5 0 0,0 12,6.5Z"
+                                                                          Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ListViewItem}}"/>
+                                                                </Grid>
+                                                                <ControlTemplate.Triggers>
+                                                                    <Trigger Property="IsChecked" Value="False">
+                                                                        <Setter TargetName="EyeIcon" Property="Opacity" Value="0.2"/>
+                                                                    </Trigger>
+                                                                </ControlTemplate.Triggers>
+                                                            </ControlTemplate>
+                                                        </CheckBox.Template>
+                                                    </CheckBox>
+
+                                                    <Border Grid.Column="1" Width="48" Height="27" BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" BorderThickness="1" Margin="5,0" VerticalAlignment="Center">
+                                                        <Image Source="{Binding Thumbnail}" Stretch="Uniform"/>
+                                                    </Border>
+
+                                                    <TextBox Grid.Column="2" Text="{Binding Name}" Margin="5,0" VerticalAlignment="Center" BorderThickness="0" Background="Transparent"
+                                                             Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ListViewItem}}"/>
+
+                                                    <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <TextBlock Text="ロック" Visibility="{Binding IsLocked, Converter={StaticResource BooleanToVisibilityConverter}}" VerticalAlignment="Center"/>
+                                                        <TextBlock Text="{Binding Opacity, StringFormat=P0}" Margin="5,0" VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                </Grid>
                                             </Border>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
 
-                                            <TextBox Grid.Column="2" Text="{Binding Name}" Margin="5,0" VerticalAlignment="Center" BorderThickness="0" Background="Transparent"
-                                                     Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ListViewItem}}"/>
+                            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Button Style="{StaticResource LayerOperationButtonStyle}" ToolTip="レイヤーを追加" Command="{Binding AddLayerCommand}">
+                                    <Path Style="{StaticResource IconPathStyle}" Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
+                                </Button>
+                                <Button Style="{StaticResource LayerOperationButtonStyle}" ToolTip="選択中のレイヤーを削除" Command="{Binding RemoveLayerCommand}">
+                                    <Path Style="{StaticResource IconPathStyle}" Data="M19,13H5V11H19V13Z" />
+                                </Button>
+                                <Button Style="{StaticResource LayerOperationButtonStyle}" ToolTip="レイヤーを上に移動" Command="{Binding MoveLayerUpCommand}">
+                                    <Path Style="{StaticResource IconPathStyle}" Data="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                                </Button>
+                                <Button Style="{StaticResource LayerOperationButtonStyle}" ToolTip="レイヤーを下に移動" Command="{Binding MoveLayerDownCommand}">
+                                    <Path Style="{StaticResource IconPathStyle}" Data="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+                    </ContentControl>
 
-                                            <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
-                                                <TextBlock Text="ロック" Visibility="{Binding IsLocked, Converter={StaticResource BooleanToVisibilityConverter}}" VerticalAlignment="Center"/>
-                                                <TextBlock Text="{Binding Opacity, StringFormat=P0}" Margin="5,0" VerticalAlignment="Center"/>
-                                            </StackPanel>
-                                        </Grid>
-                                    </Border>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
+                    <ContentControl x:Name="CanvasControlPanel" Style="{StaticResource DraggablePanelStyle}" Tag="キャンバス操作"
+                                    MinWidth="200" MinHeight="260" Width="200" Height="260"
+                                    Visibility="{Binding IsCanvasControlPanelVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <local:CanvasControlPanelView/>
+                    </ContentControl>
 
-                        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
-                            <Button Style="{StaticResource LayerOperationButtonStyle}" ToolTip="レイヤーを追加" Command="{Binding AddLayerCommand}">
-                                <Path Style="{StaticResource IconPathStyle}" Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
-                            </Button>
-                            <Button Style="{StaticResource LayerOperationButtonStyle}" ToolTip="選択中のレイヤーを削除" Command="{Binding RemoveLayerCommand}">
-                                <Path Style="{StaticResource IconPathStyle}" Data="M19,13H5V11H19V13Z" />
-                            </Button>
-                            <Button Style="{StaticResource LayerOperationButtonStyle}" ToolTip="レイヤーを上に移動" Command="{Binding MoveLayerUpCommand}">
-                                <Path Style="{StaticResource IconPathStyle}" Data="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
-                            </Button>
-                            <Button Style="{StaticResource LayerOperationButtonStyle}" ToolTip="レイヤーを下に移動" Command="{Binding MoveLayerDownCommand}">
-                                <Path Style="{StaticResource IconPathStyle}" Data="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
-                            </Button>
-                        </StackPanel>
-                    </Grid>
-                </ContentControl>
-
-                <ContentControl x:Name="CanvasControlPanel" Style="{StaticResource DraggablePanelStyle}" Tag="キャンバス操作"
-                                MinWidth="200" MinHeight="260" Width="200" Height="260"
-                                Visibility="{Binding IsCanvasControlPanelVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <local:CanvasControlPanelView/>
-                </ContentControl>
-
-            </Canvas>
+                </Canvas>
+            </DockPanel>
         </DockPanel>
-    </DockPanel>
+    </Border>
 </Window>

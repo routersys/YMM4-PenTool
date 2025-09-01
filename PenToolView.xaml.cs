@@ -2,18 +2,81 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Ink;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
+using YukkuriMovieMaker.Plugin.Community.Shape.Pen.Brush;
+using YukkuriMovieMaker.Plugin.Community.Shape.Pen.Layer;
 
 namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
 {
     public partial class PenToolView : Window
     {
+        #region Win32 API
+        [StructLayout(LayoutKind.Sequential)]
+        public struct POINT
+        {
+            public int x;
+            public int y;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct MINMAXINFO
+        {
+            public POINT ptReserved;
+            public POINT ptMaxSize;
+            public POINT ptMaxPosition;
+            public POINT ptMinTrackSize;
+            public POINT ptMaxTrackSize;
+        }
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+        public class MONITORINFO
+        {
+            public int cbSize = Marshal.SizeOf(typeof(MONITORINFO));
+            public RECT rcMonitor = new RECT();
+            public RECT rcWork = new RECT();
+            public int dwFlags = 0;
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 0)]
+        public struct RECT
+        {
+            public int left;
+            public int top;
+            public int right;
+            public int bottom;
+        }
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool GetMonitorInfo(IntPtr hMonitor, MONITORINFO lpmi);
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr MonitorFromWindow(IntPtr hwnd, int dwFlags);
+
+        [DllImport("user32.dll")]
+        static extern bool EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, MonitorEnumDelegate lpfnEnum, IntPtr dwData);
+
+        delegate bool MonitorEnumDelegate(IntPtr hMonitor, IntPtr hdcMonitor, ref RECT lprcMonitor, IntPtr dwData);
+
+        private const int MONITOR_DEFAULTTONEAREST = 0x00000002;
+        #endregion
+
+        private class PanelLayout
+        {
+            public double LeftRatio { get; set; }
+            public double TopRatio { get; set; }
+            public double WidthRatio { get; set; }
+            public double HeightRatio { get; set; }
+        }
+
         private const double SnapThreshold = 10.0;
         private const int AlwaysOnTopZIndexBase = 1000;
         private readonly Dictionary<string, ContentControl> _panels = new();
@@ -25,10 +88,54 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
         private Point? _lastMousePositionOnViewport;
         private bool _isPanning;
 
+        private readonly Dictionary<string, PanelLayout> _panelLayouts = new();
+        private bool _isLayoutInitialized = false;
+
+        private Point _dragStartPoint;
+
         public PenToolView()
         {
             InitializeComponent();
             ContentRendered += PenToolView_ContentRendered;
+            SourceInitialized += OnSourceInitialized;
+        }
+
+        private void OnSourceInitialized(object? sender, EventArgs e)
+        {
+            var helper = new WindowInteropHelper(this);
+            var source = HwndSource.FromHwnd(helper.Handle);
+            if (source != null)
+            {
+                source.AddHook(WndProc);
+            }
+        }
+
+        private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            const int WM_GETMINMAXINFO = 0x0024;
+
+            if (msg == WM_GETMINMAXINFO)
+            {
+                var mmi = Marshal.PtrToStructure<MINMAXINFO>(lParam);
+                var monitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+
+                if (monitor != IntPtr.Zero)
+                {
+                    var monitorInfo = new MONITORINFO();
+                    GetMonitorInfo(monitor, monitorInfo);
+                    var rcWorkArea = monitorInfo.rcWork;
+                    var rcMonitorArea = monitorInfo.rcMonitor;
+                    mmi.ptMaxPosition.x = Math.Abs(rcWorkArea.left - rcMonitorArea.left);
+                    mmi.ptMaxPosition.y = Math.Abs(rcWorkArea.top - rcMonitorArea.top);
+                    mmi.ptMaxSize.x = Math.Abs(rcWorkArea.right - rcWorkArea.left);
+                    mmi.ptMaxSize.y = Math.Abs(rcWorkArea.bottom - rcWorkArea.top);
+                }
+
+                Marshal.StructureToPtr(mmi, lParam, true);
+                handled = true;
+            }
+
+            return IntPtr.Zero;
         }
 
         private void PenToolView_ContentRendered(object? sender, EventArgs e)
@@ -47,7 +154,126 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
             PenSettings.Default.EraserStyle.PropertyChanged += EraserStyle_PropertyChanged;
             UpdateEraserShape();
 
-            Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(FitCanvasToView));
+            Dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, new Action(() =>
+            {
+                FitCanvasToView();
+                this.WindowState = WindowState.Maximized;
+            }));
+        }
+
+        private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 2)
+            {
+                WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+                return;
+            }
+
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                if (WindowState == WindowState.Maximized)
+                {
+                    var point = PointToScreen(e.GetPosition(this));
+                    WindowState = WindowState.Normal;
+                    Left = point.X - ActualWidth / 2;
+                    Top = point.Y - e.GetPosition(this).Y;
+                }
+                DragMove();
+
+                SnapToMonitor();
+            }
+        }
+
+        private void SnapToMonitor()
+        {
+            var windowRect = new Rect(Left, Top, Width, Height);
+            var monitors = GetMonitorWorkAreas();
+
+            Rect bestMonitor = new Rect();
+            double maxIntersection = 0;
+
+            foreach (var monitorRect in monitors)
+            {
+                var intersection = Rect.Intersect(windowRect, monitorRect);
+                if (!intersection.IsEmpty && intersection.Width * intersection.Height > maxIntersection)
+                {
+                    maxIntersection = intersection.Width * intersection.Height;
+                    bestMonitor = monitorRect;
+                }
+            }
+
+            if (maxIntersection > 0 && (maxIntersection / (windowRect.Width * windowRect.Height)) >= 0.51)
+            {
+                Left = bestMonitor.Left;
+                Top = bestMonitor.Top;
+                WindowState = WindowState.Maximized;
+            }
+        }
+
+        private List<Rect> GetMonitorWorkAreas()
+        {
+            var monitors = new List<Rect>();
+            MonitorEnumDelegate callback = (IntPtr hMonitor, IntPtr hdcMonitor, ref RECT lprcMonitor, IntPtr dwData) =>
+            {
+                var mi = new MONITORINFO();
+                if (GetMonitorInfo(hMonitor, mi))
+                {
+                    var r = mi.rcWork;
+                    monitors.Add(new Rect(r.left, r.top, r.right - r.left, r.bottom - r.top));
+                }
+                return true;
+            };
+
+            EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, callback, IntPtr.Zero);
+            return monitors;
+        }
+
+        private void ProtectedArea_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+        private void CapturePanelLayouts()
+        {
+            if (MainCanvas.ActualWidth == 0 || MainCanvas.ActualHeight == 0) return;
+
+            foreach (var (name, panel) in _panels)
+            {
+                _panelLayouts[name] = new PanelLayout
+                {
+                    LeftRatio = Canvas.GetLeft(panel) / MainCanvas.ActualWidth,
+                    TopRatio = Canvas.GetTop(panel) / MainCanvas.ActualHeight,
+                    WidthRatio = panel.ActualWidth / MainCanvas.ActualWidth,
+                    HeightRatio = panel.ActualHeight / MainCanvas.ActualHeight,
+                };
+            }
+        }
+
+        private void ApplyPanelLayouts()
+        {
+            if (!_isLayoutInitialized || MainCanvas.ActualWidth == 0 || MainCanvas.ActualHeight == 0) return;
+
+            foreach (var (name, panel) in _panels)
+            {
+                if (_panelLayouts.TryGetValue(name, out var layout))
+                {
+                    var newWidth = Math.Max(panel.MinWidth, layout.WidthRatio * MainCanvas.ActualWidth);
+                    var newHeight = Math.Max(panel.MinHeight, layout.HeightRatio * MainCanvas.ActualHeight);
+
+                    var newLeft = layout.LeftRatio * MainCanvas.ActualWidth;
+                    var newTop = layout.TopRatio * MainCanvas.ActualHeight;
+
+                    if (newLeft + newWidth > MainCanvas.ActualWidth)
+                        newLeft = MainCanvas.ActualWidth - newWidth;
+                    if (newTop + newHeight > MainCanvas.ActualHeight)
+                        newTop = MainCanvas.ActualHeight - newHeight;
+
+                    panel.Width = newWidth;
+                    panel.Height = newHeight;
+                    Canvas.SetLeft(panel, Math.Max(0, newLeft));
+                    Canvas.SetTop(panel, Math.Max(0, newTop));
+                }
+            }
         }
 
         private void FitCanvasToView()
@@ -110,6 +336,7 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
                     {
                         thumb.DragDelta += ResizeThumb_DragDelta;
                         thumb.DragStarted += ResizeThumb_DragStarted;
+                        thumb.DragCompleted += ResizeThumb_DragCompleted;
                     }
                 }
 
@@ -378,6 +605,7 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
             {
                 _draggedElement.ReleaseMouseCapture();
                 _draggedElement = null;
+                CapturePanelLayouts();
             }
         }
 
@@ -387,6 +615,11 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
             {
                 BringToFront(panel);
             }
+        }
+
+        private void ResizeThumb_DragCompleted(object sender, DragCompletedEventArgs e)
+        {
+            CapturePanelLayouts();
         }
 
         private void ResizeThumb_DragDelta(object sender, DragDeltaEventArgs e)
@@ -510,21 +743,14 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
 
         private void PenToolView_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            foreach (var panel in _panels.Values.Where(p => p.Visibility == Visibility.Visible))
+            if (!_isLayoutInitialized)
             {
-                var left = Canvas.GetLeft(panel);
-                var top = Canvas.GetTop(panel);
-
-                if (left + panel.ActualWidth > MainCanvas.ActualWidth)
-                {
-                    left = MainCanvas.ActualWidth - panel.ActualWidth;
-                    Canvas.SetLeft(panel, Math.Max(0, left));
-                }
-                if (top + panel.ActualHeight > MainCanvas.ActualHeight)
-                {
-                    top = MainCanvas.ActualHeight - panel.ActualHeight;
-                    Canvas.SetTop(panel, Math.Max(0, top));
-                }
+                CapturePanelLayouts();
+                _isLayoutInitialized = true;
+            }
+            else
+            {
+                ApplyPanelLayouts();
             }
         }
 
@@ -590,6 +816,7 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
                     break;
                 case MouseWheelAction.PenSize:
                     ViewModel.StrokeThickness += e.Delta > 0 ? 1 : -1;
+                    UpdatePenPreview(e);
                     break;
             }
         }
@@ -639,6 +866,7 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
             ViewModel.CanvasTranslateX = newTranslateX;
             ViewModel.CanvasTranslateY = newTranslateY;
 
+            UpdatePenPreview(e);
             e.Handled = true;
         }
 
@@ -672,6 +900,7 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
                     e.Handled = true;
                 }
             }
+            UpdatePenPreview(e);
         }
 
         private void CanvasViewport_MouseUp(object sender, MouseButtonEventArgs e)
@@ -709,6 +938,232 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
         {
             var size = PenSettings.Default.EraserStyle.StrokeThickness;
             inkCanvas.EraserShape = new EllipseStylusShape(size, size);
+        }
+
+        private void MinimizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
+        }
+
+        private void ListViewItem_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.Source is not TextBox && e.Source is not CheckBox)
+            {
+                _dragStartPoint = e.GetPosition(null);
+            }
+        }
+
+        private void ListViewItem_MouseMove(object sender, MouseEventArgs e)
+        {
+            Point position = e.GetPosition(null);
+            Vector diff = _dragStartPoint - position;
+
+            if (e.LeftButton == MouseButtonState.Pressed &&
+                (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance ||
+                 Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance))
+            {
+                var listViewItem = FindAncestor<ListViewItem>((DependencyObject)e.OriginalSource);
+                if (listViewItem == null) return;
+
+                var layer = (Layer.Layer)listViewItem.DataContext;
+                if (layer == null) return;
+
+                DataObject dragData = new DataObject("Layer", layer);
+                DragDrop.DoDragDrop(listViewItem, dragData, DragDropEffects.Move);
+            }
+        }
+
+        private void ListViewItem_Drop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent("Layer"))
+            {
+                var targetItem = FindAncestor<ListViewItem>((DependencyObject)e.OriginalSource);
+                if (targetItem == null) return;
+
+                var dropIndicator = FindVisualChild<Border>(targetItem, "DropIndicator");
+                if (dropIndicator != null)
+                {
+                    dropIndicator.Visibility = Visibility.Collapsed;
+                }
+
+                var targetLayer = (Layer.Layer)targetItem.DataContext;
+                var sourceLayer = (Layer.Layer)e.Data.GetData("Layer");
+
+                if (sourceLayer != null && targetLayer != null && !ReferenceEquals(sourceLayer, targetLayer) && ViewModel != null)
+                {
+                    int sourceIndex = ViewModel.Layers.IndexOf(sourceLayer);
+                    int targetIndex = ViewModel.Layers.IndexOf(targetLayer);
+                    ViewModel.MoveLayer(sourceIndex, targetIndex);
+                }
+            }
+        }
+
+        private void ListViewItem_DragOver(object sender, DragEventArgs e)
+        {
+            var targetItem = sender as ListViewItem;
+            if (targetItem == null) return;
+
+            var dropIndicator = FindVisualChild<Border>(targetItem, "DropIndicator");
+            if (dropIndicator != null)
+            {
+                dropIndicator.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void ListViewItem_DragLeave(object sender, DragEventArgs e)
+        {
+            var targetItem = sender as ListViewItem;
+            if (targetItem == null) return;
+
+            var dropIndicator = FindVisualChild<Border>(targetItem, "DropIndicator");
+            if (dropIndicator != null)
+            {
+                dropIndicator.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void ListViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is ListViewItem item && item.DataContext is Layer.Layer layer)
+            {
+                if (e.Source is not TextBox && e.Source is not CheckBox && FindAncestor<CheckBox>((DependencyObject)e.OriginalSource) == null)
+                {
+                    var originalOpacity = layer.Opacity;
+                    var propertiesView = new LayerPropertiesView
+                    {
+                        Owner = this,
+                        DataContext = layer
+                    };
+
+                    var result = propertiesView.ShowDialog();
+                    if (result == false)
+                    {
+                        layer.Opacity = originalOpacity;
+                    }
+                    else
+                    {
+                        ViewModel?.AddLayerPropertyChangedUndo(layer, nameof(Layer.Layer.Opacity), originalOpacity, layer.Opacity);
+                    }
+                }
+            }
+        }
+
+        private void CheckBox_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is CheckBox checkBox && checkBox.DataContext is Layer.Layer layer)
+            {
+                layer.IsVisible = !layer.IsVisible;
+                e.Handled = true;
+            }
+        }
+
+        private void CanvasViewport_MouseEnter(object sender, MouseEventArgs e)
+        {
+            UpdatePenPreview(e);
+        }
+
+        private void CanvasViewport_MouseLeave(object sender, MouseEventArgs e)
+        {
+            PenPreview.Visibility = Visibility.Collapsed;
+            PenPreviewRectangle.Visibility = Visibility.Collapsed;
+        }
+
+        private void UpdatePenPreview(MouseEventArgs e)
+        {
+            if (ViewModel == null || inkCanvas.EditingMode == InkCanvasEditingMode.None || inkCanvas.EditingMode == InkCanvasEditingMode.Select || Mouse.LeftButton == MouseButtonState.Pressed)
+            {
+                PenPreview.Visibility = Visibility.Collapsed;
+                PenPreviewRectangle.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            PenPreview.Visibility = Visibility.Visible;
+
+            double width = 0;
+            double height = 0;
+            var color = ViewModel.StrokeColor;
+            var isHighlighter = ViewModel.SelectedBrushType == Brush.BrushType.Highlighter;
+
+            if (inkCanvas.EditingMode == InkCanvasEditingMode.Ink)
+            {
+                width = ViewModel.StrokeThickness * ViewModel.CanvasScale;
+                height = ViewModel.StrokeThickness * ViewModel.CanvasScale;
+
+                if (isHighlighter)
+                {
+                    width /= 2;
+                }
+                PenPreview.Fill = new SolidColorBrush(Color.FromArgb(128, color.R, color.G, color.B));
+                PenPreviewRectangle.Fill = PenPreview.Fill;
+            }
+            else if (inkCanvas.EditingMode == InkCanvasEditingMode.EraseByPoint || inkCanvas.EditingMode == InkCanvasEditingMode.EraseByStroke)
+            {
+                width = PenSettings.Default.EraserStyle.StrokeThickness * ViewModel.CanvasScale;
+                height = width;
+                PenPreview.Fill = new SolidColorBrush(Color.FromArgb(128, 255, 255, 255));
+                PenPreviewRectangle.Fill = PenPreview.Fill;
+            }
+
+            if (width <= 0 || height <= 0)
+            {
+                PenPreview.Visibility = Visibility.Collapsed;
+                PenPreviewRectangle.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            Point position = e.GetPosition(CanvasViewport);
+
+            if (isHighlighter)
+            {
+                PenPreview.Visibility = Visibility.Collapsed;
+                PenPreviewRectangle.Visibility = Visibility.Visible;
+                PenPreviewRectangle.Width = width;
+                PenPreviewRectangle.Height = height;
+                Canvas.SetLeft(PenPreviewRectangle, position.X - width / 2);
+                Canvas.SetTop(PenPreviewRectangle, position.Y - height / 2);
+            }
+            else
+            {
+                PenPreviewRectangle.Visibility = Visibility.Collapsed;
+                PenPreview.Visibility = Visibility.Visible;
+                PenPreview.Width = width;
+                PenPreview.Height = height;
+                Canvas.SetLeft(PenPreview, position.X - width / 2);
+                Canvas.SetTop(PenPreview, position.Y - height / 2);
+            }
+        }
+
+        private static T? FindAncestor<T>(DependencyObject? current) where T : DependencyObject
+        {
+            do
+            {
+                if (current is T)
+                {
+                    return (T)current;
+                }
+                current = VisualTreeHelper.GetParent(current);
+            }
+            while (current != null);
+            return null;
+        }
+
+        private static T? FindVisualChild<T>(DependencyObject parent, string name) where T : FrameworkElement
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                if (child is T element && element.Name == name)
+                {
+                    return element;
+                }
+                else
+                {
+                    var result = FindVisualChild<T>(child, name);
+                    if (result != null)
+                        return result;
+                }
+            }
+            return null;
         }
     }
 }

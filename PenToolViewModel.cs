@@ -27,6 +27,7 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
         private readonly IEditorInfo info;
         private readonly ITimelineSourceAndDevices source;
         private readonly Dictionary<Stroke, Layer.Layer> _strokeLayerMap = new();
+        private readonly Dictionary<Stroke, Stroke> _displayToOriginalStrokeMap = new();
 
 
         public ObservableCollection<Layer.Layer> Layers { get; } = [];
@@ -360,7 +361,7 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
 
             foreach (var stroke in selectedStrokes)
             {
-                if (SelectedLayer.Strokes.Contains(stroke))
+                if (_strokeLayerMap.TryGetValue(stroke, out var layer) && layer == SelectedLayer)
                 {
                     validStrokes.Add(stroke);
                 }
@@ -447,19 +448,61 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
             }
         }
 
+        public void AddLayerPropertyChangedUndo(Layer.Layer layer, string propertyName, object oldValue, object newValue)
+        {
+            Action redoAction = () =>
+            {
+                var prop = typeof(Layer.Layer).GetProperty(propertyName);
+                prop?.SetValue(layer, newValue);
+            };
+
+            Action undoAction = () =>
+            {
+                var prop = typeof(Layer.Layer).GetProperty(propertyName);
+                prop?.SetValue(layer, oldValue);
+            };
+
+            PushToUndoStack(undoAction, redoAction);
+        }
+
         private void UpdateVisibleStrokes()
         {
             Strokes.StrokesChanged -= OnAggregatedStrokesChanged;
+            isUndoRedoing = true;
+
             Strokes.Clear();
             _strokeLayerMap.Clear();
-            foreach (var layer in Layers.Reverse().Where(l => l.IsVisible))
+            _displayToOriginalStrokeMap.Clear();
+
+            foreach (var layer in Layers.Reverse())
             {
-                Strokes.Add(layer.Strokes);
-                foreach (var stroke in layer.Strokes)
+                if (layer.IsVisible)
                 {
-                    _strokeLayerMap[stroke] = layer;
+                    foreach (var originalStroke in layer.Strokes)
+                    {
+                        var strokeForDisplay = originalStroke.Clone();
+                        var drawingAttributes = strokeForDisplay.DrawingAttributes;
+                        var color = drawingAttributes.Color;
+
+                        if (drawingAttributes.IsHighlighter)
+                        {
+                            drawingAttributes.IsHighlighter = false;
+                            color.A = (byte)(color.A / 2.0 * layer.Opacity);
+                        }
+                        else
+                        {
+                            color.A = (byte)(color.A * layer.Opacity);
+                        }
+                        drawingAttributes.Color = color;
+
+                        Strokes.Add(strokeForDisplay);
+                        _strokeLayerMap[strokeForDisplay] = layer;
+                        _displayToOriginalStrokeMap[strokeForDisplay] = originalStroke;
+                    }
                 }
             }
+
+            isUndoRedoing = false;
             Strokes.StrokesChanged += OnAggregatedStrokesChanged;
         }
 
@@ -467,91 +510,103 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
         {
             if (isUndoRedoing) return;
 
-            var removedStrokesList = e.Removed.ToList();
-            var addedStrokes = e.Added.ToList();
+            var removedDisplayStrokes = e.Removed.ToList();
+            var addedDisplayStrokes = e.Added.ToList();
+            var targetLayer = SelectedLayer;
 
             var isErasing = EditingMode == InkCanvasEditingMode.EraseByPoint || EditingMode == InkCanvasEditingMode.EraseByStroke;
 
-            if (isErasing && SelectedLayer != null)
+            if (isErasing)
             {
-                var strokesToRestore = removedStrokesList
-                    .Where(s => !_strokeLayerMap.TryGetValue(s, out var layer) || layer != SelectedLayer)
+                var strokesToRestore = removedDisplayStrokes
+                    .Where(s => _strokeLayerMap.TryGetValue(s, out var layer) && layer != SelectedLayer)
                     .ToList();
 
                 if (strokesToRestore.Any())
                 {
+                    removedDisplayStrokes = removedDisplayStrokes.Except(strokesToRestore).ToList();
+
                     isUndoRedoing = true;
                     Strokes.Add(new StrokeCollection(strokesToRestore));
                     isUndoRedoing = false;
                 }
-
-                removedStrokesList = removedStrokesList.Except(strokesToRestore).ToList();
             }
 
-            if (!removedStrokesList.Any() && !addedStrokes.Any()) return;
+            if (!removedDisplayStrokes.Any() && !addedDisplayStrokes.Any()) return;
 
-            var affectedLayers = new HashSet<Layer.Layer>();
-            var removedMap = new Dictionary<Layer.Layer, StrokeCollection>();
-            foreach (var stroke in removedStrokesList)
-            {
-                if (_strokeLayerMap.TryGetValue(stroke, out var layer))
-                {
-                    if (!removedMap.ContainsKey(layer))
-                    {
-                        removedMap[layer] = new StrokeCollection();
-                    }
-                    removedMap[layer].Add(stroke);
-                    affectedLayers.Add(layer);
-                }
-            }
-
-            var targetLayerForAdded = SelectedLayer;
-            if (EditingMode == InkCanvasEditingMode.EraseByPoint && removedMap.Count == 1)
-            {
-                targetLayerForAdded = removedMap.Keys.First();
-            }
-
-            if ((targetLayerForAdded?.IsLocked ?? false) || removedMap.Keys.Any(l => l.IsLocked))
+            if (targetLayer == null && addedDisplayStrokes.Any())
             {
                 isUndoRedoing = true;
-                Strokes.Remove(new StrokeCollection(addedStrokes));
-                Strokes.Add(new StrokeCollection(removedStrokesList));
+                Strokes.Remove(new StrokeCollection(addedDisplayStrokes));
                 isUndoRedoing = false;
                 return;
             }
 
-            Action redoAction = () =>
+            var affectedLayers = new HashSet<Layer.Layer>();
+            var removedOriginalStrokesMap = new Dictionary<Layer.Layer, StrokeCollection>();
+
+            foreach (var displayStroke in removedDisplayStrokes)
+            {
+                if (_strokeLayerMap.TryGetValue(displayStroke, out var layer) &&
+                    _displayToOriginalStrokeMap.TryGetValue(displayStroke, out var originalStroke))
+                {
+                    if (layer.IsLocked)
+                    {
+                        isUndoRedoing = true;
+                        Strokes.Add(displayStroke);
+                        isUndoRedoing = false;
+                        return;
+                    }
+
+                    if (!removedOriginalStrokesMap.ContainsKey(layer))
+                    {
+                        removedOriginalStrokesMap[layer] = new StrokeCollection();
+                    }
+                    removedOriginalStrokesMap[layer].Add(originalStroke);
+                    affectedLayers.Add(layer);
+                }
+            }
+
+            var addedOriginalStrokes = new StrokeCollection(addedDisplayStrokes.Select(s => s.Clone()));
+
+            if (targetLayer != null && targetLayer.IsLocked && addedOriginalStrokes.Any())
             {
                 isUndoRedoing = true;
-                foreach (var pair in removedMap)
+                Strokes.Remove(new StrokeCollection(addedDisplayStrokes));
+                isUndoRedoing = false;
+                return;
+            }
+            if (targetLayer != null)
+            {
+                affectedLayers.Add(targetLayer);
+            }
+
+            Action redoAction = () =>
+            {
+                foreach (var pair in removedOriginalStrokesMap)
                 {
                     pair.Key.Strokes.Remove(pair.Value);
                 }
-                if (targetLayerForAdded != null && addedStrokes.Any())
+                if (targetLayer != null && addedOriginalStrokes.Any())
                 {
-                    targetLayerForAdded.Strokes.Add(new StrokeCollection(addedStrokes));
+                    targetLayer.Strokes.Add(addedOriginalStrokes);
                 }
-                isUndoRedoing = false;
                 UpdateVisibleStrokes();
                 foreach (var layer in affectedLayers) UpdateLayerThumbnail(layer);
-                if (targetLayerForAdded != null) UpdateLayerThumbnail(targetLayerForAdded);
             };
 
             Action undoAction = () =>
             {
-                isUndoRedoing = true;
-                if (targetLayerForAdded != null && addedStrokes.Any())
+                if (targetLayer != null && addedOriginalStrokes.Any())
                 {
-                    targetLayerForAdded.Strokes.Remove(new StrokeCollection(addedStrokes));
+                    targetLayer.Strokes.Remove(addedOriginalStrokes);
                 }
-                foreach (var pair in removedMap)
+                foreach (var pair in removedOriginalStrokesMap)
                 {
                     pair.Key.Strokes.Add(pair.Value);
                 }
-                isUndoRedoing = false;
                 UpdateVisibleStrokes();
                 foreach (var layer in affectedLayers) UpdateLayerThumbnail(layer);
-                if (targetLayerForAdded != null) UpdateLayerThumbnail(targetLayerForAdded);
             };
 
             PushToUndoStack(undoAction, redoAction);
@@ -737,14 +792,34 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
             PushToUndoStack(undoAction, redoAction);
         }
 
+        public void MoveLayer(int oldIndex, int newIndex)
+        {
+            if (oldIndex < 0 || oldIndex >= Layers.Count || newIndex < 0 || newIndex >= Layers.Count)
+                return;
+
+            var layer = Layers[oldIndex];
+
+            Action redoAction = () => {
+                Layers.Move(oldIndex, newIndex);
+                RenumberLayers();
+                UpdateVisibleStrokes();
+            };
+            Action undoAction = () => {
+                Layers.Move(newIndex, oldIndex);
+                RenumberLayers();
+                UpdateVisibleStrokes();
+            };
+
+            redoAction.Invoke();
+            PushToUndoStack(undoAction, redoAction);
+        }
+
         private bool CanMoveLayerUp() => SelectedLayer != null && Layers.IndexOf(SelectedLayer) > 0;
         private void MoveLayerUp()
         {
             if (!CanMoveLayerUp()) return;
             int index = Layers.IndexOf(SelectedLayer!);
-            Layers.Move(index, index - 1);
-            RenumberLayers();
-            UpdateVisibleStrokes();
+            MoveLayer(index, index - 1);
             MoveLayerUpCommand.RaiseCanExecuteChanged();
             MoveLayerDownCommand.RaiseCanExecuteChanged();
         }
@@ -754,9 +829,7 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
         {
             if (!CanMoveLayerDown()) return;
             int index = Layers.IndexOf(SelectedLayer!);
-            Layers.Move(index, index + 1);
-            RenumberLayers();
-            UpdateVisibleStrokes();
+            MoveLayer(index, index + 1);
             MoveLayerUpCommand.RaiseCanExecuteChanged();
             MoveLayerDownCommand.RaiseCanExecuteChanged();
         }
