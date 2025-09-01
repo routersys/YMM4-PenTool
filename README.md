@@ -41,7 +41,11 @@ YMM4（YukkuriMovieMaker v4）の標準ペン機能を大幅に拡張し、よ�
 
 このプラグインは **LGPL-3.0 license** のもとで公開されています。詳細については、リポジトリに含まれる `LICENSE` ファイルを参照してください。
 
----
+### 謝辞
+
+このプラグインは、[YukkuriMovieMaker4コミュニティプラグイン](https://github.com/manju-summoner/YukkuriMovieMaker.Plugin.Community) をベースに、機能の追加・改修を行ったものです。
+
+素晴らしいプラグインを公開してくださった、**饅頭遣い** 様に心より感謝申し上げます。
 
 ### リリースノート
 [2025/09/01] v1.0.0
