@@ -1,0 +1,67 @@
+﻿<UserControl x:Class="YukkuriMovieMaker.Plugin.Community.Shape.Pen.CanvasControlPanelView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:YukkuriMovieMaker.Plugin.Community.Shape.Pen"
+             mc:Ignorable="d" 
+             d:DesignHeight="220" d:DesignWidth="180"
+             d:DataContext="{d:DesignInstance Type=local:PenToolViewModel}">
+    <UserControl.Resources>
+        <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+        <Style TargetType="RepeatButton" BasedOn="{StaticResource {x:Type RepeatButton}}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+    </UserControl.Resources>
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Margin="0,5,0,10" x:Name="JoystickArea" ClipToBounds="True">
+            <Border Width="100" Height="100" CornerRadius="50" Background="#FF4D4D4D" BorderBrush="#FF3C3C3C" BorderThickness="1"/>
+            <Thumb x:Name="JoystickKnob" Width="40" Height="40"
+                   DragStarted="JoystickKnob_DragStarted"
+                   DragDelta="JoystickKnob_DragDelta" 
+                   DragCompleted="JoystickKnob_DragCompleted">
+                <Thumb.Template>
+                    <ControlTemplate TargetType="Thumb">
+                        <Grid>
+                            <Ellipse Fill="#FF8A8A8A" Stroke="#FF3C3C3C" StrokeThickness="1"/>
+                            <Ellipse Margin="5" Fill="#FF6A6A6A" Stroke="#FF3C3C3C" StrokeThickness="1"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Thumb.Template>
+            </Thumb>
+        </Grid>
+
+        <Slider Grid.Row="1" VerticalAlignment="Center" Minimum="0.1" Maximum="10" Value="{Binding CanvasScale, Mode=TwoWay}" Margin="0,5"/>
+
+        <Grid Grid.Row="2" Margin="0,5,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" ToolTip="全体表示" Command="{Binding FitToViewCommand}">
+                <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Stretch="Uniform" Width="16" Height="16" Data="M10,21V19H6.41L10.91,14.5L9.5,13.09L5,17.59V14H3V21H10M14.5,10.91L19,6.41V10H21V3H14V5H17.59L13.09,9.5L14.5,10.91Z" />
+            </Button>
+
+            <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                <RepeatButton ToolTip="縮小" Command="{Binding ZoomCommand}" CommandParameter="Out" Width="24" Height="24">
+                    <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RepeatButton}}" Stretch="Uniform" Width="12" Height="12" Data="M19,13H5V11H19V13Z" />
+                </RepeatButton>
+                <RepeatButton ToolTip="拡大" Command="{Binding ZoomCommand}" CommandParameter="In" Width="24" Height="24">
+                    <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RepeatButton}}" Stretch="Uniform" Width="12" Height="12" Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
+                </RepeatButton>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>
