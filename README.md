@@ -1,6 +1,6 @@
 # YMM4 拡張ペンツールプラグイン for YMM4
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 [![.NET](https://img.shields.io/badge/.NET-9.0-purple.svg)](#)
 [![Release](https://img.shields.io/github/v/release/routersys/YMM4-PenTool.svg)](https://github.com/routersys/YMM4-PenTool/releases)
 
