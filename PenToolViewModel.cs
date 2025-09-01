@@ -311,7 +311,20 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
             UpdatePenProperties();
             LoadLayout();
             RenumberLayers();
+
+            PenSettings.Default.PenStyle.PropertyChanged += OnBrushSettingsChanged;
+            PenSettings.Default.HighlighterStyle.PropertyChanged += OnBrushSettingsChanged;
+            PenSettings.Default.PencilStyle.PropertyChanged += OnBrushSettingsChanged;
+
             Render();
+        }
+
+        private void OnBrushSettingsChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(BrushSettingsBase.IsPressure))
+            {
+                OnPropertyChanged(nameof(Pen));
+            }
         }
 
         private void UpdateLayerThumbnail(Layer.Layer layer)
@@ -773,6 +786,9 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
                     {
                         ((INotifyPropertyChanged)layer).PropertyChanged -= OnLayerPropertyChanged;
                     }
+                    PenSettings.Default.PenStyle.PropertyChanged -= OnBrushSettingsChanged;
+                    PenSettings.Default.HighlighterStyle.PropertyChanged -= OnBrushSettingsChanged;
+                    PenSettings.Default.PencilStyle.PropertyChanged -= OnBrushSettingsChanged;
                     disposer.Dispose();
                 }
                 disposedValue = true;

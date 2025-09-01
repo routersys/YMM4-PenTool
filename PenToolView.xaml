@@ -244,9 +244,27 @@
                         </Style>
                     </StackPanel.Style>
 
-                    <RadioButton Content="{DynamicResource pen}" ToolTip="ペン" IsChecked="{Binding SelectedBrushType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static brush:BrushType.Pen}}" GroupName="ToolSelection"/>
-                    <RadioButton Content="{DynamicResource marker}" ToolTip="マーカー" IsChecked="{Binding SelectedBrushType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static brush:BrushType.Highlighter}}" GroupName="ToolSelection"/>
-                    <RadioButton Content="{DynamicResource pencil}" ToolTip="鉛筆" IsChecked="{Binding SelectedBrushType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static brush:BrushType.Pencil}}" GroupName="ToolSelection"/>
+                    <RadioButton Content="{DynamicResource pen}" ToolTip="ペン (右クリックで設定)" IsChecked="{Binding SelectedBrushType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static brush:BrushType.Pen}}" GroupName="ToolSelection">
+                        <RadioButton.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="筆圧" IsCheckable="True" IsChecked="{Binding Source={x:Static local:PenSettings.Default}, Path=PenStyle.IsPressure, Mode=TwoWay}"/>
+                            </ContextMenu>
+                        </RadioButton.ContextMenu>
+                    </RadioButton>
+                    <RadioButton Content="{DynamicResource marker}" ToolTip="マーカー (右クリックで設定)" IsChecked="{Binding SelectedBrushType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static brush:BrushType.Highlighter}}" GroupName="ToolSelection">
+                        <RadioButton.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="筆圧" IsCheckable="True" IsChecked="{Binding Source={x:Static local:PenSettings.Default}, Path=HighlighterStyle.IsPressure, Mode=TwoWay}"/>
+                            </ContextMenu>
+                        </RadioButton.ContextMenu>
+                    </RadioButton>
+                    <RadioButton Content="{DynamicResource pencil}" ToolTip="鉛筆 (右クリックで設定)" IsChecked="{Binding SelectedBrushType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static brush:BrushType.Pencil}}" GroupName="ToolSelection">
+                        <RadioButton.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="筆圧" IsCheckable="True" IsChecked="{Binding Source={x:Static local:PenSettings.Default}, Path=PencilStyle.IsPressure, Mode=TwoWay}"/>
+                            </ContextMenu>
+                        </RadioButton.ContextMenu>
+                    </RadioButton>
                     <RadioButton Content="{DynamicResource eraser}" ToolTip="消しゴム (右クリックでモード切替)" IsChecked="{Binding SelectedBrushType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static brush:BrushType.Eraser}}" GroupName="ToolSelection">
                         <RadioButton.ContextMenu>
                             <ContextMenu>
@@ -359,7 +377,7 @@
                                 MinWidth="200" MinHeight="150"
                                 Visibility="{Binding IsCanvasVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <Canvas x:Name="CanvasViewport" ClipToBounds="True" Background="Transparent"
-                            PreviewMouseWheel="CanvasViewport_PreviewMouseWheel"
+                          PreviewMouseWheel="CanvasViewport_PreviewMouseWheel"
                           PreviewMouseDown="CanvasViewport_PreviewMouseDown"
                           PreviewMouseMove="CanvasViewport_PreviewMouseMove"
                           MouseUp="CanvasViewport_MouseUp">
