@@ -164,6 +164,22 @@
                 </Trigger>
             </ControlTemplate.Triggers>
         </ControlTemplate>
+        <Style x:Key="RotationThumbStyle" TargetType="Thumb">
+            <Setter Property="Width" Value="20"/>
+            <Setter Property="Height" Value="20"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Thumb">
+                        <Grid>
+                            <Ellipse Fill="White" Stroke="Black" StrokeThickness="1"/>
+                            <Path Data="M12,5V1L7,6L12,11V7C15.31,7 18,9.69 18,13C18,16.31 15.31,19 12,19C8.69,19 6,16.31 6,13H4C4,17.42 7.58,21 12,21C16.42,21 20,17.42 20,13C20,8.58 16.42,5 12,5Z" 
+                                  Fill="Black" Stretch="Uniform" Margin="4"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
         <Style TargetType="Button" BasedOn="{StaticResource ToolButtonBaseStyle}">
             <Setter Property="Template" Value="{StaticResource RichButtonTemplate}"/>
@@ -238,11 +254,11 @@
 
                 <TextBlock Text="{Binding Title, RelativeSource={RelativeSource AncestorType=Window}}" VerticalAlignment="Center" Margin="10,0,0,0" Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" MouseLeftButtonDown="ProtectedArea_MouseLeftButtonDown"/>
 
-                <Menu Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Background="Transparent" Margin="10,0,0,0" MouseLeftButtonDown="ProtectedArea_MouseLeftButtonDown">
+                <Menu Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Background="Transparent" Margin="10,0,0,0">
                     <MenuItem Header="表示(_V)">
-                        <MenuItem Header="キャンバス" IsChecked="{Binding IsCanvasVisible}" Command="{Binding TogglePanelVisibilityCommand}" CommandParameter="CanvasPanel"/>
-                        <MenuItem Header="レイヤー" IsChecked="{Binding IsLayersVisible}" Command="{Binding TogglePanelVisibilityCommand}" CommandParameter="LayersPanel"/>
-                        <MenuItem Header="キャンバス操作" IsChecked="{Binding IsCanvasControlPanelVisible}" Command="{Binding TogglePanelVisibilityCommand}" CommandParameter="CanvasControlPanel"/>
+                        <MenuItem Header="キャンバス" IsChecked="{Binding IsCanvasVisible}" IsCheckable="True" Command="{Binding TogglePanelVisibilityCommand}" CommandParameter="CanvasPanel"/>
+                        <MenuItem Header="レイヤー" IsChecked="{Binding IsLayersVisible}" IsCheckable="True" Command="{Binding TogglePanelVisibilityCommand}" CommandParameter="LayersPanel"/>
+                        <MenuItem Header="キャンバス操作" IsChecked="{Binding IsCanvasControlPanelVisible}" IsCheckable="True" Command="{Binding TogglePanelVisibilityCommand}" CommandParameter="CanvasControlPanel"/>
                     </MenuItem>
                     <MenuItem Header="設定(_S)">
                         <MenuItem Header="マウスホイールの動作">
@@ -577,6 +593,19 @@
                                     MinWidth="200" MinHeight="260" Width="200" Height="260"
                                     Visibility="{Binding IsCanvasControlPanelVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <local:CanvasControlPanelView/>
+                    </ContentControl>
+
+                    <ContentControl x:Name="HistoryPanel" Style="{StaticResource DraggablePanelStyle}" Tag="ヒストリー"
+                                    MinWidth="150" MinHeight="200"
+                                    Visibility="{Binding IsHistoryVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <ListView ItemsSource="{Binding History}" SelectedIndex="{Binding CurrentHistoryIndex, Mode=OneWay}" BorderThickness="0" HorizontalContentAlignment="Stretch" Background="Transparent">
+                            <ListView.ItemTemplate>
+                                <DataTemplate DataType="{x:Type local:HistoryItem}">
+                                    <TextBlock Text="{Binding Description}" Margin="5"
+                                               Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ListViewItem}}"/>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
                     </ContentControl>
 
                 </Canvas>

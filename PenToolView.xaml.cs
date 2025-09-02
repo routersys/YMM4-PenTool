@@ -13,6 +13,8 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using YukkuriMovieMaker.Plugin.Community.Shape.Pen.Brush;
 using YukkuriMovieMaker.Plugin.Community.Shape.Pen.Layer;
+using System.Windows.Documents;
+using System.Windows.Media.Imaging;
 
 namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
 {
@@ -92,6 +94,8 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
         private bool _isLayoutInitialized = false;
 
         private Point _dragStartPoint;
+        private CustomSelectionAdorner? _customAdorner;
+        private StrokeCollection? _originalLayerStrokes;
 
         public PenToolView()
         {
@@ -153,6 +157,12 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
 
             PenSettings.Default.EraserStyle.PropertyChanged += EraserStyle_PropertyChanged;
             UpdateEraserShape();
+            inkCanvas.SelectionMoving += InkCanvas_SelectionMoving;
+            inkCanvas.SelectionMoved += InkCanvas_SelectionMoved;
+            inkCanvas.SelectionResizing += InkCanvas_SelectionResizing;
+            inkCanvas.SelectionResized += InkCanvas_SelectionResized;
+            inkCanvas.Strokes.StrokesChanged += Strokes_StrokesChanged;
+
 
             Dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, new Action(() =>
             {
@@ -311,6 +321,11 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
             base.OnClosing(e);
             SizeChanged -= PenToolView_SizeChanged;
             PenSettings.Default.EraserStyle.PropertyChanged -= EraserStyle_PropertyChanged;
+            inkCanvas.SelectionMoving -= InkCanvas_SelectionMoving;
+            inkCanvas.SelectionMoved -= InkCanvas_SelectionMoved;
+            inkCanvas.SelectionResizing -= InkCanvas_SelectionResizing;
+            inkCanvas.SelectionResized -= InkCanvas_SelectionResized;
+            inkCanvas.Strokes.StrokesChanged -= Strokes_StrokesChanged;
         }
 
         private void InitializePanels()
@@ -318,6 +333,7 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
             _panels.Add("CanvasPanel", CanvasPanel);
             _panels.Add("LayersPanel", LayersPanel);
             _panels.Add("CanvasControlPanel", CanvasControlPanel);
+            _panels.Add("HistoryPanel", HistoryPanel);
 
             foreach (var panel in _panels.Values)
             {
@@ -435,6 +451,13 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
                 panel.Height = 240;
                 Canvas.SetLeft(panel, Math.Max(220, MainCanvas.ActualWidth - 480));
                 Canvas.SetTop(panel, MainCanvas.ActualHeight - 250);
+            }
+            else if (name == "HistoryPanel")
+            {
+                panel.Width = 200;
+                panel.Height = 300;
+                Canvas.SetLeft(panel, 20);
+                Canvas.SetTop(panel, MainCanvas.ActualHeight - 320);
             }
         }
 
@@ -767,6 +790,7 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
                     if (panel.Name == "CanvasPanel") ViewModel.IsCanvasVisible = false;
                     else if (panel.Name == "LayersPanel") ViewModel.IsLayersVisible = false;
                     else if (panel.Name == "CanvasControlPanel") ViewModel.IsCanvasControlPanelVisible = false;
+                    else if (panel.Name == "HistoryPanel") ViewModel.IsHistoryVisible = false;
                 };
                 contextMenu.Items.Add(closeItem);
 
@@ -920,9 +944,31 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
 
         private void InkCanvas_SelectionChanged(object sender, EventArgs e)
         {
-            if (sender is InkCanvas inkCanvas && ViewModel != null)
+            if (sender is not InkCanvas inkCanvas || ViewModel == null) return;
+
+            var adornerLayer = AdornerLayer.GetAdornerLayer(inkCanvas);
+            if (adornerLayer == null) return;
+
+            if (_customAdorner != null)
             {
-                ViewModel.FilterSelection(inkCanvas.GetSelectedStrokes(), newSelection => inkCanvas.Select(newSelection));
+                adornerLayer.Remove(_customAdorner);
+                _customAdorner = null;
+            }
+
+            var selectedStrokes = inkCanvas.GetSelectedStrokes();
+            if (selectedStrokes.Count > 0)
+            {
+                ViewModel.FilterSelection(selectedStrokes, newSelection => inkCanvas.Select(newSelection));
+                selectedStrokes = inkCanvas.GetSelectedStrokes();
+
+                if (selectedStrokes.Count > 0)
+                {
+                    _customAdorner = new CustomSelectionAdorner(inkCanvas, ViewModel)
+                    {
+                        Style = (Style)FindResource("RotationThumbStyle")
+                    };
+                    adornerLayer.Add(_customAdorner);
+                }
             }
         }
 
@@ -1132,6 +1178,51 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
                 Canvas.SetTop(PenPreview, position.Y - height / 2);
             }
         }
+        private void Strokes_StrokesChanged(object sender, StrokeCollectionChangedEventArgs e)
+        {
+            if (_customAdorner != null)
+            {
+                _customAdorner.UpdateSelection();
+            }
+        }
+
+        private void InkCanvas_SelectionMoving(object sender, InkCanvasSelectionEditingEventArgs e)
+        {
+            if (_originalLayerStrokes == null && ViewModel != null)
+            {
+                _originalLayerStrokes = ViewModel.GetOriginalStrokes(inkCanvas.GetSelectedStrokes());
+            }
+        }
+
+        private void InkCanvas_SelectionMoved(object sender, EventArgs e)
+        {
+            if (_originalLayerStrokes != null && _originalLayerStrokes.Count > 0 && ViewModel != null)
+            {
+                var newStrokes = inkCanvas.GetSelectedStrokes().Clone();
+                ViewModel.AddTransformUndo(_originalLayerStrokes, newStrokes, "移動");
+                inkCanvas.Select(new StrokeCollection());
+            }
+            _originalLayerStrokes = null;
+        }
+
+        private void InkCanvas_SelectionResizing(object sender, InkCanvasSelectionEditingEventArgs e)
+        {
+            if (_originalLayerStrokes == null && ViewModel != null)
+            {
+                _originalLayerStrokes = ViewModel.GetOriginalStrokes(inkCanvas.GetSelectedStrokes());
+            }
+        }
+
+        private void InkCanvas_SelectionResized(object sender, EventArgs e)
+        {
+            if (_originalLayerStrokes != null && _originalLayerStrokes.Count > 0 && ViewModel != null)
+            {
+                var newStrokes = inkCanvas.GetSelectedStrokes().Clone();
+                ViewModel.AddTransformUndo(_originalLayerStrokes, newStrokes, "サイズ変更");
+                inkCanvas.Select(new StrokeCollection());
+            }
+            _originalLayerStrokes = null;
+        }
 
         private static T? FindAncestor<T>(DependencyObject? current) where T : DependencyObject
         {
@@ -1164,6 +1255,164 @@ namespace YukkuriMovieMaker.Plugin.Community.Shape.Pen
                 }
             }
             return null;
+        }
+        internal class CustomSelectionAdorner : Adorner
+        {
+            private readonly InkCanvas _inkCanvas;
+            private readonly PenToolViewModel _viewModel;
+            private readonly Thumb _rotationThumb;
+            private readonly VisualCollection _visuals;
+            private Rect _selectionRect;
+            private Point _center;
+            private double _initialAngle;
+            private StrokeCollection? _originalLayerStrokes;
+
+            public CustomSelectionAdorner(InkCanvas inkCanvas, PenToolViewModel viewModel) : base(inkCanvas)
+            {
+                _inkCanvas = inkCanvas;
+                _viewModel = viewModel;
+                _visuals = new VisualCollection(this);
+
+                _rotationThumb = new Thumb();
+                _rotationThumb.DragStarted += RotationThumb_DragStarted;
+                _rotationThumb.DragDelta += RotationThumb_DragDelta;
+                _rotationThumb.DragCompleted += RotationThumb_DragCompleted;
+
+                _visuals.Add(_rotationThumb);
+                UpdateSelection();
+            }
+
+            public new Style Style
+            {
+                get => _rotationThumb.Style;
+                set => _rotationThumb.Style = value;
+            }
+
+            private void RotationThumb_DragStarted(object sender, DragStartedEventArgs e)
+            {
+                var startPoint = Mouse.GetPosition(_inkCanvas);
+                var vector = startPoint - _center;
+                _initialAngle = Vector.AngleBetween(new Vector(0, -1), vector);
+                if (_viewModel != null)
+                {
+                    _originalLayerStrokes = _viewModel.GetOriginalStrokes(_inkCanvas.GetSelectedStrokes());
+                }
+            }
+
+            private void RotationThumb_DragDelta(object sender, DragDeltaEventArgs e)
+            {
+                var currentPoint = Mouse.GetPosition(_inkCanvas);
+                var vector = currentPoint - _center;
+                var currentAngle = Vector.AngleBetween(new Vector(0, -1), vector);
+                var angle = currentAngle - _initialAngle;
+
+                var matrix = new Matrix();
+                matrix.RotateAt(angle, _center.X, _center.Y);
+
+                var selectedStrokes = _inkCanvas.GetSelectedStrokes();
+                selectedStrokes.Transform(matrix, false);
+
+                _initialAngle = currentAngle;
+
+                UpdateSelection();
+            }
+
+            private void RotationThumb_DragCompleted(object sender, DragCompletedEventArgs e)
+            {
+                if (_originalLayerStrokes != null && _originalLayerStrokes.Count > 0)
+                {
+                    var newStrokes = _inkCanvas.GetSelectedStrokes().Clone();
+                    _viewModel.AddTransformUndo(_originalLayerStrokes, newStrokes, "回転");
+                    _inkCanvas.Select(new StrokeCollection());
+                }
+                _originalLayerStrokes = null;
+            }
+
+            public void UpdateSelection()
+            {
+                var selectedStrokes = _inkCanvas.GetSelectedStrokes();
+                if (selectedStrokes.Count == 0)
+                {
+                    Visibility = Visibility.Collapsed;
+                    return;
+                }
+
+                Visibility = Visibility.Visible;
+                _selectionRect = selectedStrokes.GetBounds();
+                _center = new Point(_selectionRect.Left + _selectionRect.Width / 2, _selectionRect.Top + _selectionRect.Height / 2);
+                InvalidateVisual();
+            }
+
+            protected override int VisualChildrenCount => _visuals.Count;
+
+            protected override Visual GetVisualChild(int index) => _visuals[index];
+
+            protected override Size ArrangeOverride(Size finalSize)
+            {
+                UpdateSelection();
+                var thumbSize = new Size(20, 20);
+                var thumbRect = new Rect(new Point(_selectionRect.Left + (_selectionRect.Width - thumbSize.Width) / 2, _selectionRect.Top - thumbSize.Height - 5), thumbSize);
+                _rotationThumb.Arrange(thumbRect);
+                return finalSize;
+            }
+
+            protected override void OnRender(DrawingContext drawingContext)
+            {
+                base.OnRender(drawingContext);
+
+                var bounds = _inkCanvas.GetSelectedStrokes().GetBounds();
+                if (bounds.IsEmpty) return;
+
+                var pen = new System.Windows.Media.Pen(new SolidColorBrush(GetContrastingColor(bounds)), 1)
+                {
+                    DashStyle = new DashStyle(new double[] { 4, 4 }, 0)
+                };
+
+                drawingContext.DrawRectangle(Brushes.Transparent, pen, bounds);
+            }
+
+            private Color GetContrastingColor(Rect bounds)
+            {
+                try
+                {
+                    var renderTarget = new RenderTargetBitmap((int)_viewModel.CanvasSize.Width, (int)_viewModel.CanvasSize.Height, 96, 96, PixelFormats.Pbgra32);
+
+                    var drawingVisual = new DrawingVisual();
+                    using (var drawingContext = drawingVisual.RenderOpen())
+                    {
+                        drawingContext.DrawImage(_viewModel.Bitmap, new Rect(0, 0, _viewModel.CanvasSize.Width, _viewModel.CanvasSize.Height));
+
+                        var unselectedStrokes = new StrokeCollection(_inkCanvas.Strokes.Except(_inkCanvas.GetSelectedStrokes()));
+                        unselectedStrokes.Draw(drawingContext);
+                    }
+                    renderTarget.Render(drawingVisual);
+
+                    if (bounds.Width < 1 || bounds.Height < 1) return Colors.Black;
+                    var croppedBitmap = new CroppedBitmap(renderTarget, new Int32Rect((int)bounds.X, (int)bounds.Y, (int)bounds.Width, (int)bounds.Height));
+                    int stride = croppedBitmap.PixelWidth * (croppedBitmap.Format.BitsPerPixel / 8);
+                    var pixels = new byte[croppedBitmap.PixelHeight * stride];
+                    croppedBitmap.CopyPixels(pixels, stride, 0);
+
+                    long r = 0, g = 0, b = 0;
+                    for (int i = 0; i < pixels.Length; i += 4)
+                    {
+                        b += pixels[i];
+                        g += pixels[i + 1];
+                        r += pixels[i + 2];
+                    }
+
+                    int count = pixels.Length / 4;
+                    var avgColor = Color.FromRgb((byte)(r / count), (byte)(g / count), (byte)(b / count));
+
+                    var brightness = (0.299 * avgColor.R + 0.587 * avgColor.G + 0.114 * avgColor.B) / 255;
+
+                    return brightness > 0.5 ? Colors.Black : Colors.White;
+                }
+                catch
+                {
+                    return Colors.Black;
+                }
+            }
         }
     }
 }
