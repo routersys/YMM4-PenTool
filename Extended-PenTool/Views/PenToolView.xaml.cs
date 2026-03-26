@@ -1,8 +1,8 @@
 using ExtendedPenTool.Brush;
 using ExtendedPenTool.Enums;
+using ExtendedPenTool.Localization;
 using ExtendedPenTool.Models;
 using ExtendedPenTool.Settings;
-using ExtendedPenTool.Localization;
 using ExtendedPenTool.ViewModels;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
@@ -44,6 +44,12 @@ public partial class PenToolView : Window
         InitializeComponent();
         ContentRendered += OnContentRendered;
         SourceInitialized += OnSourceInitialized;
+        DataContextChanged += OnDataContextChanged;
+    }
+
+    private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+    {
+        ViewModel?.WindowThemeService.Bind(this);
     }
 
     private void OnSourceInitialized(object? sender, EventArgs e)

@@ -1,7 +1,6 @@
+using ExtendedPenTool.Localization;
 using YukkuriMovieMaker.Plugin.Shape;
 using YukkuriMovieMaker.Project;
-
-using ExtendedPenTool.Localization;
 
 namespace ExtendedPenTool.Plugin;
 

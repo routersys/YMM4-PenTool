@@ -1,5 +1,5 @@
-using ExtendedPenTool.SourceGenerator;
 using ExtendedPenTool.Localization;
+using ExtendedPenTool.SourceGenerator;
 
 namespace ExtendedPenTool.Enums;
 

@@ -1,7 +1,7 @@
 using ExtendedPenTool.Brush;
 using ExtendedPenTool.Enums;
-using ExtendedPenTool.Models;
 using ExtendedPenTool.Localization;
+using ExtendedPenTool.Models;
 using System.Windows.Media;
 using YukkuriMovieMaker.Plugin;
 

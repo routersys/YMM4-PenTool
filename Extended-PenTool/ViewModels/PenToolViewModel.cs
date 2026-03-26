@@ -35,7 +35,7 @@ internal sealed class PenToolViewModel : Bindable, IDisposable
     private bool isFilteringSelection;
     private bool disposed;
 
-    
+    public IWindowThemeService WindowThemeService => registry.Resolve<IWindowThemeService>();
     public ObservableCollection<HistoryItem> History => historyService.Items;
     public ObservableCollection<Layer> Layers => layerService.Layers;
     public StrokeCollection Strokes => layerService.AggregatedStrokes;
@@ -214,6 +214,7 @@ internal sealed class PenToolViewModel : Bindable, IDisposable
         registry.RegisterSingleton<IHistoryService>(historyService);
         registry.RegisterSingleton<ILayerService>(layerService);
         registry.RegisterSingleton<IRenderService>(renderService);
+        registry.RegisterSingleton<IWindowThemeService>(new WindowThemeService());
 
         historyService.StateChanged += OnHistoryStateChanged;
 
@@ -793,6 +794,8 @@ internal sealed class PenToolViewModel : Bindable, IDisposable
             Owner = Application.Current.Windows.OfType<Views.PenToolView>().FirstOrDefault(),
             DataContext = layer,
         };
+
+        WindowThemeService.Bind(view);
 
         if (view.ShowDialog() == true && Math.Abs(original - layer.Opacity) > 1e-9)
         {

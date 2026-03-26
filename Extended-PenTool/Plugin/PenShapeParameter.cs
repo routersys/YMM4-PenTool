@@ -1,7 +1,7 @@
 using ExtendedPenTool.Controls;
 using ExtendedPenTool.Editors;
-using ExtendedPenTool.Models;
 using ExtendedPenTool.Localization;
+using ExtendedPenTool.Models;
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using YukkuriMovieMaker.Commons;

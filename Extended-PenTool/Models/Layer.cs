@@ -1,7 +1,7 @@
+using ExtendedPenTool.Localization;
 using System.Windows.Ink;
 using System.Windows.Media.Imaging;
 using YukkuriMovieMaker.Commons;
-using ExtendedPenTool.Localization;
 
 namespace ExtendedPenTool.Models;
 
