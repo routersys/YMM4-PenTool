@@ -1,27 +1,28 @@
 using ExtendedPenTool.SourceGenerator;
+using ExtendedPenTool.Localization;
 
 namespace ExtendedPenTool.Enums;
 
 internal enum HistoryKind
 {
-    [DisplayLabel("描画")]
+    [DisplayLabel("Draw", ResourceType = typeof(Texts), ResourceName = nameof(Texts.HistoryDraw))]
     Draw,
-    [DisplayLabel("消去")]
+    [DisplayLabel("Erase", ResourceType = typeof(Texts), ResourceName = nameof(Texts.HistoryErase))]
     Erase,
-    [DisplayLabel("選択")]
+    [DisplayLabel("Select", ResourceType = typeof(Texts), ResourceName = nameof(Texts.HistorySelect))]
     Select,
-    [DisplayLabel("レイヤーを追加")]
+    [DisplayLabel("AddLayer", ResourceType = typeof(Texts), ResourceName = nameof(Texts.HistoryAddLayer))]
     AddLayer,
-    [DisplayLabel("レイヤーを削除")]
+    [DisplayLabel("RemoveLayer", ResourceType = typeof(Texts), ResourceName = nameof(Texts.HistoryRemoveLayer))]
     RemoveLayer,
-    [DisplayLabel("レイヤーを移動")]
+    [DisplayLabel("MoveLayer", ResourceType = typeof(Texts), ResourceName = nameof(Texts.HistoryMoveLayer))]
     MoveLayer,
-    [DisplayLabel("移動")]
+    [DisplayLabel("Move", ResourceType = typeof(Texts), ResourceName = nameof(Texts.HistoryMoveStrokes))]
     MoveStrokes,
-    [DisplayLabel("サイズ変更")]
+    [DisplayLabel("Resize", ResourceType = typeof(Texts), ResourceName = nameof(Texts.HistoryResizeStrokes))]
     ResizeStrokes,
-    [DisplayLabel("回転")]
+    [DisplayLabel("Rotate", ResourceType = typeof(Texts), ResourceName = nameof(Texts.HistoryRotateStrokes))]
     RotateStrokes,
-    [DisplayLabel("レイヤーのプロパティを変更")]
+    [DisplayLabel("LayerProperty", ResourceType = typeof(Texts), ResourceName = nameof(Texts.HistoryLayerProperty))]
     LayerProperty,
 }

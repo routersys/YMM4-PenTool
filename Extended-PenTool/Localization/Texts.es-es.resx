@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+<data name="CurrentCulture" xml:space="preserve"><value>es-es</value></data>
+<data name="PluginName" xml:space="preserve"><value>Herramienta de Pluma Extendida</value></data>
+<data name="EditWithPenTool" xml:space="preserve"><value>Editar con la herramienta Pluma</value></data>
+<data name="EditWithPenToolDescription" xml:space="preserve"><value>Abre la ventana de la Herramienta de Pluma Extendida para editar el dibujo.</value></data>
+<data name="Thickness" xml:space="preserve"><value>Grosor</value></data>
+<data name="ThicknessDescription" xml:space="preserve"><value>Cambia el grosor de todo el dibujo.</value></data>
+<data name="Length" xml:space="preserve"><value>Longitud</value></data>
+<data name="LengthDescription" xml:space="preserve"><value>Controla la animación del dibujo (del punto inicial al final).</value></data>
+<data name="Offset" xml:space="preserve"><value>Desplazamiento</value></data>
+<data name="OffsetDescription" xml:space="preserve"><value>Desplaza la posición inicial del dibujo.</value></data>
+<data name="LayerNamePrefix" xml:space="preserve"><value>Capa</value></data>
+<data name="LayerNameFormat" xml:space="preserve"><value>Capa {0}</value></data>
+<data name="NewLayerName" xml:space="preserve"><value>Nueva capa</value></data>
+<data name="LayerPropertiesTitle" xml:space="preserve"><value>Propiedades de capa</value></data>
+<data name="OpacityLabel" xml:space="preserve"><value>Opacidad:</value></data>
+<data name="Cancel" xml:space="preserve"><value>Cancelar</value></data>
+<data name="Close" xml:space="preserve"><value>Cerrar</value></data>
+<data name="MenuView" xml:space="preserve"><value>Ver (_V)</value></data>
+<data name="MenuSettings" xml:space="preserve"><value>Configuración (_S)</value></data>
+<data name="PanelCanvas" xml:space="preserve"><value>Lienzo</value></data>
+<data name="PanelLayers" xml:space="preserve"><value>Capas</value></data>
+<data name="PanelCanvasControls" xml:space="preserve"><value>Controles de lienzo</value></data>
+<data name="PanelHistory" xml:space="preserve"><value>Historial</value></data>
+<data name="MouseWheelAction" xml:space="preserve"><value>Acción de la rueda del ratón</value></data>
+<data name="MouseWheelZoomCanvas" xml:space="preserve"><value>Zoom del lienzo</value></data>
+<data name="MouseWheelPenSize" xml:space="preserve"><value>Cambiar tamaño del lápiz</value></data>
+<data name="ToolbarLayout" xml:space="preserve"><value>Diseño de la barra de herramientas</value></data>
+<data name="DirectionTop" xml:space="preserve"><value>Arriba</value></data>
+<data name="DirectionBottom" xml:space="preserve"><value>Abajo</value></data>
+<data name="DirectionLeft" xml:space="preserve"><value>Izquierda</value></data>
+<data name="DirectionRight" xml:space="preserve"><value>Derecha</value></data>
+<data name="TooltipPen" xml:space="preserve"><value>Pluma (clic derecho para configurar)</value></data>
+<data name="TooltipHighlighter" xml:space="preserve"><value>Resaltador (clic derecho para configurar)</value></data>
+<data name="TooltipPencil" xml:space="preserve"><value>Lápiz (clic derecho para configurar)</value></data>
+<data name="TooltipEraser" xml:space="preserve"><value>Borrador (clic derecho para cambiar de modo)</value></data>
+<data name="Pressure" xml:space="preserve"><value>Presión</value></data>
+<data name="EraserPoint" xml:space="preserve"><value>Borrado por punto</value></data>
+<data name="EraserStroke" xml:space="preserve"><value>Borrado de trazo</value></data>
+<data name="Select" xml:space="preserve"><value>Seleccionar</value></data>
+<data name="Undo" xml:space="preserve"><value>Deshacer (Ctrl+Z)</value></data>
+<data name="Redo" xml:space="preserve"><value>Rehacer (Ctrl+Y)</value></data>
+<data name="Import" xml:space="preserve"><value>Importar</value></data>
+<data name="Export" xml:space="preserve"><value>Exportar</value></data>
+<data name="SaveAsImage" xml:space="preserve"><value>Guardar como imagen</value></data>
+<data name="ExportAsIsf" xml:space="preserve"><value>Exportar como ISF</value></data>
+<data name="Locked" xml:space="preserve"><value>Bloqueado</value></data>
+<data name="AddLayer" xml:space="preserve"><value>Agregar capa</value></data>
+<data name="RemoveSelectedLayer" xml:space="preserve"><value>Eliminar capa seleccionada</value></data>
+<data name="MoveLayerUp" xml:space="preserve"><value>Mover capa arriba</value></data>
+<data name="MoveLayerDown" xml:space="preserve"><value>Mover capa abajo</value></data>
+<data name="FitToView" xml:space="preserve"><value>Ajustar a la vista</value></data>
+<data name="ResetRotation" xml:space="preserve"><value>Restablecer rotación</value></data>
+<data name="ZoomOut" xml:space="preserve"><value>Alejar</value></data>
+<data name="ZoomIn" xml:space="preserve"><value>Acercar</value></data>
+<data name="AlwaysOnTop" xml:space="preserve"><value>Siempre al frente</value></data>
+<data name="Translucent" xml:space="preserve"><value>Semitransparente</value></data>
+<data name="UpdateNotificationTitle" xml:space="preserve"><value>ExtendedPenTool - Aviso de actualización</value></data>
+<data name="UpdateNotificationMessage" xml:space="preserve"><value>Hay una nueva versión del complemento PenTool disponible.\n\nVersión actual: v{0}\nÚltima versión: v{1}\n\n¿Abrir la página de descarga?\n\n(Si selecciona "No", no se mostrarán más notificaciones para esta versión (v{1}))</value></data>
+<data name="HistoryDraw" xml:space="preserve"><value>Dibujar</value></data>
+<data name="HistoryErase" xml:space="preserve"><value>Borrar</value></data>
+<data name="HistorySelect" xml:space="preserve"><value>Seleccionar</value></data>
+<data name="HistoryAddLayer" xml:space="preserve"><value>Agregar capa</value></data>
+<data name="HistoryRemoveLayer" xml:space="preserve"><value>Eliminar capa</value></data>
+<data name="HistoryMoveLayer" xml:space="preserve"><value>Mover capa</value></data>
+<data name="HistoryMoveStrokes" xml:space="preserve"><value>Mover</value></data>
+<data name="HistoryResizeStrokes" xml:space="preserve"><value>Redimensionar</value></data>
+<data name="HistoryRotateStrokes" xml:space="preserve"><value>Rotar</value></data>
+<data name="HistoryLayerProperty" xml:space="preserve"><value>Cambiar propiedades de capa</value></data>
+</root>

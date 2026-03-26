@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:loc="clr-namespace:ExtendedPenTool.Localization"
              mc:Ignorable="d"
              d:DesignHeight="26" d:DesignWidth="200">
-    <Button Content="ペンツールで編集" Click="Button_Click"/>
+    <Button Content="{x:Static loc:Texts.EditWithPenTool}" Click="Button_Click"/>
 </UserControl>

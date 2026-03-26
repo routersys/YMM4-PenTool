@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+<data name="CurrentCulture" xml:space="preserve"><value>id-id</value></data>
+<data name="PluginName" xml:space="preserve"><value>Alat Pena Ekstensi</value></data>
+<data name="EditWithPenTool" xml:space="preserve"><value>Edit dengan Alat Pena</value></data>
+<data name="EditWithPenToolDescription" xml:space="preserve"><value>Buka jendela Alat Pena Ekstensi untuk mengedit gambar.</value></data>
+<data name="Thickness" xml:space="preserve"><value>Ketebalan</value></data>
+<data name="ThicknessDescription" xml:space="preserve"><value>Ubah ketebalan seluruh gambar.</value></data>
+<data name="Length" xml:space="preserve"><value>Panjang</value></data>
+<data name="LengthDescription" xml:space="preserve"><value>Kontrol animasi gambar (dari titik awal ke titik akhir).</value></data>
+<data name="Offset" xml:space="preserve"><value>Offset</value></data>
+<data name="OffsetDescription" xml:space="preserve"><value>Geser posisi awal gambar.</value></data>
+<data name="LayerNamePrefix" xml:space="preserve"><value>Layer</value></data>
+<data name="LayerNameFormat" xml:space="preserve"><value>Layer {0}</value></data>
+<data name="NewLayerName" xml:space="preserve"><value>Layer Baru</value></data>
+<data name="LayerPropertiesTitle" xml:space="preserve"><value>Properti Layer</value></data>
+<data name="OpacityLabel" xml:space="preserve"><value>Opasitas:</value></data>
+<data name="Cancel" xml:space="preserve"><value>Batal</value></data>
+<data name="Close" xml:space="preserve"><value>Tutup</value></data>
+<data name="MenuView" xml:space="preserve"><value>Tampilan (_V)</value></data>
+<data name="MenuSettings" xml:space="preserve"><value>Pengaturan (_S)</value></data>
+<data name="PanelCanvas" xml:space="preserve"><value>Kanvas</value></data>
+<data name="PanelLayers" xml:space="preserve"><value>Layer</value></data>
+<data name="PanelCanvasControls" xml:space="preserve"><value>Kontrol Kanvas</value></data>
+<data name="PanelHistory" xml:space="preserve"><value>Riwayat</value></data>
+<data name="MouseWheelAction" xml:space="preserve"><value>Aksi Roda Mouse</value></data>
+<data name="MouseWheelZoomCanvas" xml:space="preserve"><value>Perbesar/Perkecil Kanvas</value></data>
+<data name="MouseWheelPenSize" xml:space="preserve"><value>Ubah Ukuran Pena</value></data>
+<data name="ToolbarLayout" xml:space="preserve"><value>Tata Letak Toolbar</value></data>
+<data name="DirectionTop" xml:space="preserve"><value>Atas</value></data>
+<data name="DirectionBottom" xml:space="preserve"><value>Bawah</value></data>
+<data name="DirectionLeft" xml:space="preserve"><value>Kiri</value></data>
+<data name="DirectionRight" xml:space="preserve"><value>Kanan</value></data>
+<data name="TooltipPen" xml:space="preserve"><value>Pena (klik kanan untuk mengatur)</value></data>
+<data name="TooltipHighlighter" xml:space="preserve"><value>Stabilo (klik kanan untuk mengatur)</value></data>
+<data name="TooltipPencil" xml:space="preserve"><value>Pensil (klik kanan untuk mengatur)</value></data>
+<data name="TooltipEraser" xml:space="preserve"><value>Penghapus (klik kanan untuk ganti mode)</value></data>
+<data name="Pressure" xml:space="preserve"><value>Tekanan</value></data>
+<data name="EraserPoint" xml:space="preserve"><value>Hapus Titik</value></data>
+<data name="EraserStroke" xml:space="preserve"><value>Hapus Goresan</value></data>
+<data name="Select" xml:space="preserve"><value>Pilih</value></data>
+<data name="Undo" xml:space="preserve"><value>Urungkan (Ctrl+Z)</value></data>
+<data name="Redo" xml:space="preserve"><value>Ulangi (Ctrl+Y)</value></data>
+<data name="Import" xml:space="preserve"><value>Impor</value></data>
+<data name="Export" xml:space="preserve"><value>Ekspor</value></data>
+<data name="SaveAsImage" xml:space="preserve"><value>Simpan sebagai Gambar</value></data>
+<data name="ExportAsIsf" xml:space="preserve"><value>Ekspor sebagai ISF</value></data>
+<data name="Locked" xml:space="preserve"><value>Terkunci</value></data>
+<data name="AddLayer" xml:space="preserve"><value>Tambah Layer</value></data>
+<data name="RemoveSelectedLayer" xml:space="preserve"><value>Hapus Layer Terpilih</value></data>
+<data name="MoveLayerUp" xml:space="preserve"><value>Pindahkan Layer ke Atas</value></data>
+<data name="MoveLayerDown" xml:space="preserve"><value>Pindahkan Layer ke Bawah</value></data>
+<data name="FitToView" xml:space="preserve"><value>Sesuaikan ke Tampilan</value></data>
+<data name="ResetRotation" xml:space="preserve"><value>Reset Rotasi</value></data>
+<data name="ZoomOut" xml:space="preserve"><value>Perkecil</value></data>
+<data name="ZoomIn" xml:space="preserve"><value>Perbesar</value></data>
+<data name="AlwaysOnTop" xml:space="preserve"><value>Selalu di Atas</value></data>
+<data name="Translucent" xml:space="preserve"><value>Transparan</value></data>
+<data name="UpdateNotificationTitle" xml:space="preserve"><value>ExtendedPenTool - Notifikasi Pembaruan</value></data>
+<data name="UpdateNotificationMessage" xml:space="preserve"><value>Versi baru plugin PenTool tersedia.\n\nVersi saat ini: v{0}\nVersi terbaru: v{1}\n\nBuka halaman unduhan?\n\n(Jika memilih "Tidak", notifikasi untuk versi ini (v{1}) tidak akan ditampilkan lagi)</value></data>
+<data name="HistoryDraw" xml:space="preserve"><value>Gambar</value></data>
+<data name="HistoryErase" xml:space="preserve"><value>Hapus</value></data>
+<data name="HistorySelect" xml:space="preserve"><value>Pilih</value></data>
+<data name="HistoryAddLayer" xml:space="preserve"><value>Tambah Layer</value></data>
+<data name="HistoryRemoveLayer" xml:space="preserve"><value>Hapus Layer</value></data>
+<data name="HistoryMoveLayer" xml:space="preserve"><value>Pindahkan Layer</value></data>
+<data name="HistoryMoveStrokes" xml:space="preserve"><value>Pindah</value></data>
+<data name="HistoryResizeStrokes" xml:space="preserve"><value>Ubah Ukuran</value></data>
+<data name="HistoryRotateStrokes" xml:space="preserve"><value>Putar</value></data>
+<data name="HistoryLayerProperty" xml:space="preserve"><value>Ubah Properti Layer</value></data>
+</root>

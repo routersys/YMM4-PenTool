@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using YukkuriMovieMaker.Commons;
+using ExtendedPenTool.Localization;
 
 namespace ExtendedPenTool.Controls;
 
@@ -83,13 +84,9 @@ public sealed class UpdateCheckPanel : UserControl, IPropertyEditorControl
             if (latestVersion == ignoredVersion) return;
 
             var message =
-                $"新しいバージョンのPenToolプラグインが利用可能です。\n\n" +
-                $"現在のバージョン: v{CurrentVersion}\n" +
-                $"最新バージョン: v{latestVersion}\n\n" +
-                $"ダウンロードページを開きますか？\n\n" +
-                $"（「いいえ」を選択すると、このバージョン(v{latestVersion})の通知は表示されなくなります）";
+                string.Format(Texts.UpdateNotificationMessage, CurrentVersion, latestVersion);
 
-            var result = MessageBox.Show(message, "ExtendedPenTool - 更新通知",
+            var result = MessageBox.Show(message, Texts.UpdateNotificationTitle,
                 MessageBoxButton.YesNo, MessageBoxImage.Information);
 
             if (result == MessageBoxResult.Yes)

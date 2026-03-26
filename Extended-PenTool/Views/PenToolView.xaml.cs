@@ -2,6 +2,7 @@ using ExtendedPenTool.Brush;
 using ExtendedPenTool.Enums;
 using ExtendedPenTool.Models;
 using ExtendedPenTool.Settings;
+using ExtendedPenTool.Localization;
 using ExtendedPenTool.ViewModels;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
@@ -479,7 +480,7 @@ public partial class PenToolView : Window
         if (sender is not FrameworkElement header || header.TemplatedParent is not ContentControl panel || ViewModel is null) return;
         var ctx = new ContextMenu { PlacementTarget = header };
 
-        var close = new MenuItem { Header = "閉じる" };
+        var close = new MenuItem { Header = Texts.Close };
         close.Click += (_, _) =>
         {
             switch (panel.Name)
@@ -498,11 +499,11 @@ public partial class PenToolView : Window
             if (!layout.ContainsKey(panel.Name)) layout[panel.Name] = new PanelLayoutInfo();
             var info = layout[panel.Name];
 
-            var pinItem = new MenuItem { Header = "常に最前面", IsCheckable = true, IsChecked = info.IsAlwaysOnTop };
+            var pinItem = new MenuItem { Header = Texts.AlwaysOnTop, IsCheckable = true, IsChecked = info.IsAlwaysOnTop };
             pinItem.Click += (_, _) => { info.IsAlwaysOnTop = !info.IsAlwaysOnTop; NormalizeZIndices(); };
             ctx.Items.Add(pinItem);
 
-            var opItem = new MenuItem { Header = "半透明", IsCheckable = true, IsChecked = info.IsTranslucent };
+            var opItem = new MenuItem { Header = Texts.Translucent, IsCheckable = true, IsChecked = info.IsTranslucent };
             opItem.Click += (_, _) => { if (opItem is MenuItem mi) { info.IsTranslucent = mi.IsChecked; panel.Opacity = mi.IsChecked ? 0.5 : 1.0; } };
             ctx.Items.Add(opItem);
         }

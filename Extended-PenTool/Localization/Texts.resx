@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+<data name="CurrentCulture" xml:space="preserve"><value>ja-jp</value></data>
+<data name="PluginName" xml:space="preserve"><value>拡張ペンツール</value></data>
+<data name="EditWithPenTool" xml:space="preserve"><value>ペンツールで編集</value></data>
+<data name="EditWithPenToolDescription" xml:space="preserve"><value>拡張ペンツールウィンドウを開いて描画を編集します。</value></data>
+<data name="Thickness" xml:space="preserve"><value>太さ</value></data>
+<data name="ThicknessDescription" xml:space="preserve"><value>描画全体の太さを変更します。</value></data>
+<data name="Length" xml:space="preserve"><value>長さ</value></data>
+<data name="LengthDescription" xml:space="preserve"><value>描画のアニメーション（始点から終点まで）を制御します。</value></data>
+<data name="Offset" xml:space="preserve"><value>オフセット</value></data>
+<data name="OffsetDescription" xml:space="preserve"><value>描画開始位置をずらします。</value></data>
+<data name="LayerNamePrefix" xml:space="preserve"><value>レイヤー</value></data>
+<data name="LayerNameFormat" xml:space="preserve"><value>レイヤー {0}</value></data>
+<data name="NewLayerName" xml:space="preserve"><value>新規レイヤー</value></data>
+<data name="LayerPropertiesTitle" xml:space="preserve"><value>レイヤープロパティ</value></data>
+<data name="OpacityLabel" xml:space="preserve"><value>不透明度:</value></data>
+<data name="Cancel" xml:space="preserve"><value>キャンセル</value></data>
+<data name="Close" xml:space="preserve"><value>閉じる</value></data>
+<data name="MenuView" xml:space="preserve"><value>表示(_V)</value></data>
+<data name="MenuSettings" xml:space="preserve"><value>設定(_S)</value></data>
+<data name="PanelCanvas" xml:space="preserve"><value>キャンバス</value></data>
+<data name="PanelLayers" xml:space="preserve"><value>レイヤー</value></data>
+<data name="PanelCanvasControls" xml:space="preserve"><value>キャンバス操作</value></data>
+<data name="PanelHistory" xml:space="preserve"><value>履歴管理</value></data>
+<data name="MouseWheelAction" xml:space="preserve"><value>マウスホイールの動作</value></data>
+<data name="MouseWheelZoomCanvas" xml:space="preserve"><value>キャンバスの拡大・縮小</value></data>
+<data name="MouseWheelPenSize" xml:space="preserve"><value>ペンサイズの変更</value></data>
+<data name="ToolbarLayout" xml:space="preserve"><value>ツールバーのレイアウト</value></data>
+<data name="DirectionTop" xml:space="preserve"><value>上</value></data>
+<data name="DirectionBottom" xml:space="preserve"><value>下</value></data>
+<data name="DirectionLeft" xml:space="preserve"><value>左</value></data>
+<data name="DirectionRight" xml:space="preserve"><value>右</value></data>
+<data name="TooltipPen" xml:space="preserve"><value>ペン (右クリックで設定)</value></data>
+<data name="TooltipHighlighter" xml:space="preserve"><value>マーカー (右クリックで設定)</value></data>
+<data name="TooltipPencil" xml:space="preserve"><value>鉛筆 (右クリックで設定)</value></data>
+<data name="TooltipEraser" xml:space="preserve"><value>消しゴム (右クリックでモード切替)</value></data>
+<data name="Pressure" xml:space="preserve"><value>筆圧</value></data>
+<data name="EraserPoint" xml:space="preserve"><value>ポイント消し</value></data>
+<data name="EraserStroke" xml:space="preserve"><value>ストローク消し</value></data>
+<data name="Select" xml:space="preserve"><value>選択</value></data>
+<data name="Undo" xml:space="preserve"><value>元に戻す (Ctrl+Z)</value></data>
+<data name="Redo" xml:space="preserve"><value>やり直し (Ctrl+Y)</value></data>
+<data name="Import" xml:space="preserve"><value>インポート</value></data>
+<data name="Export" xml:space="preserve"><value>エクスポート</value></data>
+<data name="SaveAsImage" xml:space="preserve"><value>画像として保存</value></data>
+<data name="ExportAsIsf" xml:space="preserve"><value>ISF形式でエクスポート</value></data>
+<data name="Locked" xml:space="preserve"><value>ロック</value></data>
+<data name="AddLayer" xml:space="preserve"><value>レイヤーを追加</value></data>
+<data name="RemoveSelectedLayer" xml:space="preserve"><value>選択中のレイヤーを削除</value></data>
+<data name="MoveLayerUp" xml:space="preserve"><value>レイヤーを上に移動</value></data>
+<data name="MoveLayerDown" xml:space="preserve"><value>レイヤーを下に移動</value></data>
+<data name="FitToView" xml:space="preserve"><value>全体表示</value></data>
+<data name="ResetRotation" xml:space="preserve"><value>回転をリセット</value></data>
+<data name="ZoomOut" xml:space="preserve"><value>縮小</value></data>
+<data name="ZoomIn" xml:space="preserve"><value>拡大</value></data>
+<data name="AlwaysOnTop" xml:space="preserve"><value>常に最前面</value></data>
+<data name="Translucent" xml:space="preserve"><value>半透明</value></data>
+<data name="UpdateNotificationTitle" xml:space="preserve"><value>ExtendedPenTool - 更新通知</value></data>
+<data name="UpdateNotificationMessage" xml:space="preserve"><value>新しいバージョンのPenToolプラグインが利用可能です。\n\n現在のバージョン: v{0}\n最新バージョン: v{1}\n\nダウンロードページを開きますか？\n\n（「いいえ」を選択すると、このバージョン(v{1})の通知は表示されなくなります）</value></data>
+<data name="HistoryDraw" xml:space="preserve"><value>描画</value></data>
+<data name="HistoryErase" xml:space="preserve"><value>消去</value></data>
+<data name="HistorySelect" xml:space="preserve"><value>選択</value></data>
+<data name="HistoryAddLayer" xml:space="preserve"><value>レイヤーを追加</value></data>
+<data name="HistoryRemoveLayer" xml:space="preserve"><value>レイヤーを削除</value></data>
+<data name="HistoryMoveLayer" xml:space="preserve"><value>レイヤーを移動</value></data>
+<data name="HistoryMoveStrokes" xml:space="preserve"><value>移動</value></data>
+<data name="HistoryResizeStrokes" xml:space="preserve"><value>サイズ変更</value></data>
+<data name="HistoryRotateStrokes" xml:space="preserve"><value>回転</value></data>
+<data name="HistoryLayerProperty" xml:space="preserve"><value>レイヤーのプロパティを変更</value></data>
+</root>

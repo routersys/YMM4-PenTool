@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+<data name="CurrentCulture" xml:space="preserve"><value>zh-cn</value></data>
+<data name="PluginName" xml:space="preserve"><value>扩展画笔工具</value></data>
+<data name="EditWithPenTool" xml:space="preserve"><value>使用画笔工具编辑</value></data>
+<data name="EditWithPenToolDescription" xml:space="preserve"><value>打开扩展画笔工具窗口以编辑绘图。</value></data>
+<data name="Thickness" xml:space="preserve"><value>粗细</value></data>
+<data name="ThicknessDescription" xml:space="preserve"><value>更改整个绘图的粗细。</value></data>
+<data name="Length" xml:space="preserve"><value>长度</value></data>
+<data name="LengthDescription" xml:space="preserve"><value>控制绘图动画（从起点到终点）。</value></data>
+<data name="Offset" xml:space="preserve"><value>偏移</value></data>
+<data name="OffsetDescription" xml:space="preserve"><value>偏移绘图起始位置。</value></data>
+<data name="LayerNamePrefix" xml:space="preserve"><value>图层</value></data>
+<data name="LayerNameFormat" xml:space="preserve"><value>图层 {0}</value></data>
+<data name="NewLayerName" xml:space="preserve"><value>新建图层</value></data>
+<data name="LayerPropertiesTitle" xml:space="preserve"><value>图层属性</value></data>
+<data name="OpacityLabel" xml:space="preserve"><value>不透明度:</value></data>
+<data name="Cancel" xml:space="preserve"><value>取消</value></data>
+<data name="Close" xml:space="preserve"><value>关闭</value></data>
+<data name="MenuView" xml:space="preserve"><value>视图(_V)</value></data>
+<data name="MenuSettings" xml:space="preserve"><value>设置(_S)</value></data>
+<data name="PanelCanvas" xml:space="preserve"><value>画布</value></data>
+<data name="PanelLayers" xml:space="preserve"><value>图层</value></data>
+<data name="PanelCanvasControls" xml:space="preserve"><value>画布操作</value></data>
+<data name="PanelHistory" xml:space="preserve"><value>历史记录</value></data>
+<data name="MouseWheelAction" xml:space="preserve"><value>鼠标滚轮操作</value></data>
+<data name="MouseWheelZoomCanvas" xml:space="preserve"><value>缩放画布</value></data>
+<data name="MouseWheelPenSize" xml:space="preserve"><value>更改画笔大小</value></data>
+<data name="ToolbarLayout" xml:space="preserve"><value>工具栏布局</value></data>
+<data name="DirectionTop" xml:space="preserve"><value>上</value></data>
+<data name="DirectionBottom" xml:space="preserve"><value>下</value></data>
+<data name="DirectionLeft" xml:space="preserve"><value>左</value></data>
+<data name="DirectionRight" xml:space="preserve"><value>右</value></data>
+<data name="TooltipPen" xml:space="preserve"><value>画笔（右键配置）</value></data>
+<data name="TooltipHighlighter" xml:space="preserve"><value>荧光笔（右键配置）</value></data>
+<data name="TooltipPencil" xml:space="preserve"><value>铅笔（右键配置）</value></data>
+<data name="TooltipEraser" xml:space="preserve"><value>橡皮擦（右键切换模式）</value></data>
+<data name="Pressure" xml:space="preserve"><value>压感</value></data>
+<data name="EraserPoint" xml:space="preserve"><value>点擦除</value></data>
+<data name="EraserStroke" xml:space="preserve"><value>笔画擦除</value></data>
+<data name="Select" xml:space="preserve"><value>选择</value></data>
+<data name="Undo" xml:space="preserve"><value>撤销 (Ctrl+Z)</value></data>
+<data name="Redo" xml:space="preserve"><value>重做 (Ctrl+Y)</value></data>
+<data name="Import" xml:space="preserve"><value>导入</value></data>
+<data name="Export" xml:space="preserve"><value>导出</value></data>
+<data name="SaveAsImage" xml:space="preserve"><value>保存为图像</value></data>
+<data name="ExportAsIsf" xml:space="preserve"><value>导出为 ISF</value></data>
+<data name="Locked" xml:space="preserve"><value>锁定</value></data>
+<data name="AddLayer" xml:space="preserve"><value>添加图层</value></data>
+<data name="RemoveSelectedLayer" xml:space="preserve"><value>删除选中图层</value></data>
+<data name="MoveLayerUp" xml:space="preserve"><value>上移图层</value></data>
+<data name="MoveLayerDown" xml:space="preserve"><value>下移图层</value></data>
+<data name="FitToView" xml:space="preserve"><value>适合视图</value></data>
+<data name="ResetRotation" xml:space="preserve"><value>重置旋转</value></data>
+<data name="ZoomOut" xml:space="preserve"><value>缩小</value></data>
+<data name="ZoomIn" xml:space="preserve"><value>放大</value></data>
+<data name="AlwaysOnTop" xml:space="preserve"><value>始终置顶</value></data>
+<data name="Translucent" xml:space="preserve"><value>半透明</value></data>
+<data name="UpdateNotificationTitle" xml:space="preserve"><value>ExtendedPenTool - 更新通知</value></data>
+<data name="UpdateNotificationMessage" xml:space="preserve"><value>有新版本的 PenTool 插件可用。\n\n当前版本: v{0}\n最新版本: v{1}\n\n是否打开下载页面？\n\n（选择“否”后，将不再显示此版本(v{1})的通知）</value></data>
+<data name="HistoryDraw" xml:space="preserve"><value>绘制</value></data>
+<data name="HistoryErase" xml:space="preserve"><value>擦除</value></data>
+<data name="HistorySelect" xml:space="preserve"><value>选择</value></data>
+<data name="HistoryAddLayer" xml:space="preserve"><value>添加图层</value></data>
+<data name="HistoryRemoveLayer" xml:space="preserve"><value>删除图层</value></data>
+<data name="HistoryMoveLayer" xml:space="preserve"><value>移动图层</value></data>
+<data name="HistoryMoveStrokes" xml:space="preserve"><value>移动</value></data>
+<data name="HistoryResizeStrokes" xml:space="preserve"><value>调整大小</value></data>
+<data name="HistoryRotateStrokes" xml:space="preserve"><value>旋转</value></data>
+<data name="HistoryLayerProperty" xml:space="preserve"><value>更改图层属性</value></data>
+</root>

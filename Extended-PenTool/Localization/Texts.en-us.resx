@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+<data name="CurrentCulture" xml:space="preserve"><value>en-us</value></data>
+<data name="PluginName" xml:space="preserve"><value>Extended Pen Tool</value></data>
+<data name="EditWithPenTool" xml:space="preserve"><value>Edit with Pen Tool</value></data>
+<data name="EditWithPenToolDescription" xml:space="preserve"><value>Open the Extended Pen Tool window to edit the drawing.</value></data>
+<data name="Thickness" xml:space="preserve"><value>Thickness</value></data>
+<data name="ThicknessDescription" xml:space="preserve"><value>Change the thickness of the entire drawing.</value></data>
+<data name="Length" xml:space="preserve"><value>Length</value></data>
+<data name="LengthDescription" xml:space="preserve"><value>Control the drawing animation from start point to end point.</value></data>
+<data name="Offset" xml:space="preserve"><value>Offset</value></data>
+<data name="OffsetDescription" xml:space="preserve"><value>Shift the drawing start position.</value></data>
+<data name="LayerNamePrefix" xml:space="preserve"><value>Layer</value></data>
+<data name="LayerNameFormat" xml:space="preserve"><value>Layer {0}</value></data>
+<data name="NewLayerName" xml:space="preserve"><value>New Layer</value></data>
+<data name="LayerPropertiesTitle" xml:space="preserve"><value>Layer Properties</value></data>
+<data name="OpacityLabel" xml:space="preserve"><value>Opacity:</value></data>
+<data name="Cancel" xml:space="preserve"><value>Cancel</value></data>
+<data name="Close" xml:space="preserve"><value>Close</value></data>
+<data name="MenuView" xml:space="preserve"><value>View (_V)</value></data>
+<data name="MenuSettings" xml:space="preserve"><value>Settings (_S)</value></data>
+<data name="PanelCanvas" xml:space="preserve"><value>Canvas</value></data>
+<data name="PanelLayers" xml:space="preserve"><value>Layers</value></data>
+<data name="PanelCanvasControls" xml:space="preserve"><value>Canvas Controls</value></data>
+<data name="PanelHistory" xml:space="preserve"><value>History</value></data>
+<data name="MouseWheelAction" xml:space="preserve"><value>Mouse Wheel Action</value></data>
+<data name="MouseWheelZoomCanvas" xml:space="preserve"><value>Zoom Canvas</value></data>
+<data name="MouseWheelPenSize" xml:space="preserve"><value>Change Pen Size</value></data>
+<data name="ToolbarLayout" xml:space="preserve"><value>Toolbar Layout</value></data>
+<data name="DirectionTop" xml:space="preserve"><value>Top</value></data>
+<data name="DirectionBottom" xml:space="preserve"><value>Bottom</value></data>
+<data name="DirectionLeft" xml:space="preserve"><value>Left</value></data>
+<data name="DirectionRight" xml:space="preserve"><value>Right</value></data>
+<data name="TooltipPen" xml:space="preserve"><value>Pen (right-click to configure)</value></data>
+<data name="TooltipHighlighter" xml:space="preserve"><value>Highlighter (right-click to configure)</value></data>
+<data name="TooltipPencil" xml:space="preserve"><value>Pencil (right-click to configure)</value></data>
+<data name="TooltipEraser" xml:space="preserve"><value>Eraser (right-click to switch mode)</value></data>
+<data name="Pressure" xml:space="preserve"><value>Pressure</value></data>
+<data name="EraserPoint" xml:space="preserve"><value>Point Erase</value></data>
+<data name="EraserStroke" xml:space="preserve"><value>Stroke Erase</value></data>
+<data name="Select" xml:space="preserve"><value>Select</value></data>
+<data name="Undo" xml:space="preserve"><value>Undo (Ctrl+Z)</value></data>
+<data name="Redo" xml:space="preserve"><value>Redo (Ctrl+Y)</value></data>
+<data name="Import" xml:space="preserve"><value>Import</value></data>
+<data name="Export" xml:space="preserve"><value>Export</value></data>
+<data name="SaveAsImage" xml:space="preserve"><value>Save as Image</value></data>
+<data name="ExportAsIsf" xml:space="preserve"><value>Export as ISF</value></data>
+<data name="Locked" xml:space="preserve"><value>Locked</value></data>
+<data name="AddLayer" xml:space="preserve"><value>Add Layer</value></data>
+<data name="RemoveSelectedLayer" xml:space="preserve"><value>Remove Selected Layer</value></data>
+<data name="MoveLayerUp" xml:space="preserve"><value>Move Layer Up</value></data>
+<data name="MoveLayerDown" xml:space="preserve"><value>Move Layer Down</value></data>
+<data name="FitToView" xml:space="preserve"><value>Fit to View</value></data>
+<data name="ResetRotation" xml:space="preserve"><value>Reset Rotation</value></data>
+<data name="ZoomOut" xml:space="preserve"><value>Zoom Out</value></data>
+<data name="ZoomIn" xml:space="preserve"><value>Zoom In</value></data>
+<data name="AlwaysOnTop" xml:space="preserve"><value>Always on Top</value></data>
+<data name="Translucent" xml:space="preserve"><value>Translucent</value></data>
+<data name="UpdateNotificationTitle" xml:space="preserve"><value>ExtendedPenTool - Update Notice</value></data>
+<data name="UpdateNotificationMessage" xml:space="preserve"><value>A new version of the PenTool plugin is available.\n\nCurrent version: v{0}\nLatest version: v{1}\n\nOpen the download page?\n\n(If you select "No", notifications for this version (v{1}) will no longer be shown)</value></data>
+<data name="HistoryDraw" xml:space="preserve"><value>Draw</value></data>
+<data name="HistoryErase" xml:space="preserve"><value>Erase</value></data>
+<data name="HistorySelect" xml:space="preserve"><value>Select</value></data>
+<data name="HistoryAddLayer" xml:space="preserve"><value>Add Layer</value></data>
+<data name="HistoryRemoveLayer" xml:space="preserve"><value>Remove Layer</value></data>
+<data name="HistoryMoveLayer" xml:space="preserve"><value>Move Layer</value></data>
+<data name="HistoryMoveStrokes" xml:space="preserve"><value>Move</value></data>
+<data name="HistoryResizeStrokes" xml:space="preserve"><value>Resize</value></data>
+<data name="HistoryRotateStrokes" xml:space="preserve"><value>Rotate</value></data>
+<data name="HistoryLayerProperty" xml:space="preserve"><value>Change Layer Properties</value></data>
+</root>
