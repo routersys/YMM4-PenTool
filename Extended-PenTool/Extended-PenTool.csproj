@@ -5,9 +5,12 @@
 		<UseWPF>true</UseWPF>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<Version>2.3.0</Version>
-		<Platforms>AnyCPU;x64;x64</Platforms>
+		<Version>3.0.0</Version>
+		<RootNamespace>ExtendedPenTool</RootNamespace>
+		<AssemblyName>Extended-PenTool</AssemblyName>
+		<Platforms>AnyCPU;x64</Platforms>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -19,31 +22,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Reference Include="AvalonDock">
-			<HintPath>$(YMM4DirPath)AvalonDock.dll</HintPath>
-			<Private>false</Private>
-		</Reference>
-		<Reference Include="NAudio">
-			<HintPath>$(YMM4DirPath)NAudio.dll</HintPath>
-			<Private>false</Private>
-		</Reference>
-		<Reference Include="NAudio.Core">
-			<HintPath>$(YMM4DirPath)NAudio.Core.dll</HintPath>
-			<Private>false</Private>
-		</Reference>
-		<Reference Include="NAudio.Midi">
-			<HintPath>$(YMM4DirPath)NAudio.Midi.dll</HintPath>
-			<Private>false</Private>
-		</Reference>
-		<Reference Include="NCalc.Core">
-			<HintPath>$(YMM4DirPath)NCalc.Core.dll</HintPath>
-			<Private>false</Private>
-		</Reference>
-		<Reference Include="Newtonsoft.Json">
-			<HintPath>$(YMM4DirPath)Newtonsoft.Json.dll</HintPath>
-		</Reference>
 		<Reference Include="SharpGen.Runtime">
 			<HintPath>$(YMM4DirPath)SharpGen.Runtime.dll</HintPath>
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="SharpGen.Runtime.COM">
+			<HintPath>$(YMM4DirPath)SharpGen.Runtime.COM.dll</HintPath>
 			<Private>false</Private>
 		</Reference>
 		<Reference Include="Vortice.Direct2D1">
@@ -70,6 +54,10 @@
 			<HintPath>$(YMM4DirPath)Vortice.Mathematics.dll</HintPath>
 			<Private>false</Private>
 		</Reference>
+		<Reference Include="Newtonsoft.Json">
+			<HintPath>$(YMM4DirPath)Newtonsoft.Json.dll</HintPath>
+			<Private>false</Private>
+		</Reference>
 		<Reference Include="YukkuriMovieMaker">
 			<HintPath>$(YMM4DirPath)YukkuriMovieMaker.dll</HintPath>
 			<Private>false</Private>
@@ -82,14 +70,10 @@
 			<HintPath>$(YMM4DirPath)YukkuriMovieMaker.Plugin.dll</HintPath>
 			<Private>false</Private>
 		</Reference>
-		<Reference Include="SharpGen.Runtime.COM">
-			<HintPath>$(YMM4DirPath)SharpGen.Runtime.COM.dll</HintPath>
-			<Private>false</Private>
-		</Reference>
-		<Reference Include="Vortice.DirectX">
-			<HintPath>$(YMM4DirPath)Vortice.DirectX.dll</HintPath>
-			<Private>false</Private>
-		</Reference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
