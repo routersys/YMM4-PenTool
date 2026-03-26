@@ -9,6 +9,7 @@ using ExtendedPenTool.Settings;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Ink;
@@ -35,7 +36,9 @@ internal sealed partial class PenToolViewModel : Bindable, IDisposable
     {
         var prefix = $"{Texts.LayerDefaultName} ";
         if (!name.StartsWith(prefix, StringComparison.Ordinal)) return false;
-        return int.TryParse(name[prefix.Length..], out _);
+        var suffix = name[prefix.Length..];
+        return suffix.Length > 0 &&
+               int.TryParse(suffix, NumberStyles.None, CultureInfo.InvariantCulture, out _);
     }
 
     public ObservableCollection<HistoryItem> History => historyService.Items;
