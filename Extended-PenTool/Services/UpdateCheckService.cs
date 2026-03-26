@@ -1,6 +1,6 @@
 using ExtendedPenTool.Localization;
+using ExtendedPenTool.Settings;
 using System.Diagnostics;
-using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
@@ -13,8 +13,6 @@ public static class UpdateCheckService
 {
     private static bool updateCheckCompleted;
     private static readonly HttpClient httpClient = new();
-    private static string settingsFilePath = string.Empty;
-    private static string ignoredVersion = string.Empty;
     private static readonly string CurrentVersion = GetCurrentVersion();
     private const string RepoUrl = "https://api.github.com/repos/routersys/YMM4-PenTool/releases/latest";
     private const string ReleasesUrl = "https://github.com/routersys/YMM4-PenTool/releases/latest";
@@ -41,24 +39,6 @@ public static class UpdateCheckService
             httpClient.DefaultRequestHeaders.UserAgent.Add(
                 new ProductInfoHeaderValue("YMM4-ExtendedPenTool", CurrentVersion));
         }
-
-        InitializeSettingsPath();
-    }
-
-    private static void InitializeSettingsPath()
-    {
-        try
-        {
-            var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            if (!string.IsNullOrEmpty(dir))
-            {
-                settingsFilePath = Path.Combine(dir, "ExtendedPenToolSettings.json");
-                LoadSettings();
-            }
-        }
-        catch
-        {
-        }
     }
 
     public static async Task CheckForUpdatesAsync()
@@ -80,7 +60,7 @@ public static class UpdateCheckService
             var latestVersion = tag.StartsWith('v') ? tag[1..] : tag;
 
             if (!IsNewVersionAvailable(CurrentVersion, latestVersion)) return;
-            if (latestVersion == ignoredVersion) return;
+            if (latestVersion == PenSettings.Default.IgnoredVersion) return;
 
             var message = string.Format(Texts.UpdateNotificationMessage, CurrentVersion, latestVersion);
 
@@ -93,8 +73,7 @@ public static class UpdateCheckService
             }
             else
             {
-                ignoredVersion = latestVersion;
-                SaveSettings();
+                PenSettings.Default.IgnoredVersion = latestVersion;
             }
         }
         catch
@@ -131,41 +110,5 @@ public static class UpdateCheckService
             return false;
         }
     }
-
-    private sealed class PluginSettings
-    {
-        public string IgnoredVersion { get; set; } = string.Empty;
-    }
-
-    private static void LoadSettings()
-    {
-        if (string.IsNullOrEmpty(settingsFilePath) || !File.Exists(settingsFilePath)) return;
-
-        try
-        {
-            var json = File.ReadAllText(settingsFilePath);
-            var settings = JsonSerializer.Deserialize<PluginSettings>(json);
-            if (settings is not null)
-            {
-                ignoredVersion = settings.IgnoredVersion;
-            }
-        }
-        catch
-        {
-        }
-    }
-
-    private static void SaveSettings()
-    {
-        if (string.IsNullOrEmpty(settingsFilePath)) return;
-
-        try
-        {
-            var settings = new PluginSettings { IgnoredVersion = ignoredVersion };
-            File.WriteAllText(settingsFilePath, JsonSerializer.Serialize(settings));
-        }
-        catch
-        {
-        }
-    }
 }
+

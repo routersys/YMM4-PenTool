@@ -30,6 +30,9 @@ internal sealed class PenSettings : SettingsBase<PenSettings>
 
     public Dictionary<string, PanelLayoutInfo> Layout { get; set; } = [];
 
+    public string IgnoredVersion { get => ignoredVersion; set => Set(ref ignoredVersion, value); }
+    private string ignoredVersion = string.Empty;
+
     public override void Initialize()
     {
     }
