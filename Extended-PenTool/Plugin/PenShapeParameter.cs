@@ -14,20 +14,20 @@ namespace ExtendedPenTool.Plugin;
 
 internal sealed class PenShapeParameter : ShapeParameterBase
 {
-    [Display(Name = "ペンツールで編集", Description = "拡張ペンツールウィンドウを開いて描画を編集します。")]
+    [Display(Name = nameof(Texts.EditWithPenToolName), Description = nameof(Texts.EditWithPenToolDescription), ResourceType = typeof(Texts))]
     [OpenPenToolButton]
     public ImmutableList<Layer> Layers { get => layers; set => Set(ref layers, value); }
-    private ImmutableList<Layer> layers = [new Layer("レイヤー 1")];
+    private ImmutableList<Layer> layers = [new Layer($"{Texts.LayerDefaultName} 1")];
 
-    [Display(Name = "太さ", Description = "描画全体の太さを変更します。")]
+    [Display(Name = nameof(Texts.ThicknessName), Description = nameof(Texts.ThicknessDescription), ResourceType = typeof(Texts))]
     [AnimationSlider("F1", "%", 0.1d, 200)]
     public Animation Thickness { get; } = new(100, 0.1, YMM4Constants.VeryLargeValue);
 
-    [Display(Name = "長さ", Description = "描画のアニメーション（始点から終点まで）を制御します。")]
+    [Display(Name = nameof(Texts.LengthName), Description = nameof(Texts.LengthDescription), ResourceType = typeof(Texts))]
     [AnimationSlider("F1", "%", 0, 100)]
     public Animation Length { get; } = new(100, 0, 100);
 
-    [Display(Name = "オフセット", Description = "描画開始位置をずらします。")]
+    [Display(Name = nameof(Texts.OffsetName), Description = nameof(Texts.OffsetDescription), ResourceType = typeof(Texts))]
     [AnimationSlider("F1", "%", -100, 100)]
     public Animation Offset { get; } = new(0, YMM4Constants.VerySmallValue, YMM4Constants.VeryLargeValue);
 
@@ -63,7 +63,7 @@ internal sealed class PenShapeParameter : ShapeParameterBase
 
     private sealed class SharedData
     {
-        public ImmutableList<Layer> Layers { get; set; } = [new Layer("レイヤー 1")];
+        public ImmutableList<Layer> Layers { get; set; } = [new Layer($"{Texts.LayerDefaultName} 1")];
         public Animation Thickness { get; } = new(100, 0.1, YMM4Constants.VeryLargeValue);
         public Animation Length { get; } = new(100, 0, 100);
         public Animation Offset { get; } = new(0, YMM4Constants.VerySmallValue, YMM4Constants.VeryLargeValue);

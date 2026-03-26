@@ -9,7 +9,7 @@ namespace ExtendedPenTool.Settings;
 internal sealed class PenSettings : SettingsBase<PenSettings>
 {
     public override SettingsCategory Category => SettingsCategory.None;
-    public override string Name => "拡張ペンツール";
+    public override string Name => Texts.SettingsName;
     public override bool HasSettingView => false;
     public override object SettingView => throw new NotImplementedException();
 

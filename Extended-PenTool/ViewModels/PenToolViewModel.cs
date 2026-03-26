@@ -32,8 +32,7 @@ internal sealed partial class PenToolViewModel : Bindable, IDisposable
     private bool isFilteringSelection;
     private bool disposed;
 
-    [GeneratedRegex(@"^レイヤー \d+$")]
-    private static partial Regex DefaultLayerNamePattern();
+    private static Regex DefaultLayerNamePattern() => new($"^{Regex.Escape(Texts.LayerDefaultName)} \\d+$");
 
     public ObservableCollection<HistoryItem> History => historyService.Items;
     public ObservableCollection<Layer> Layers => layerService.Layers;
@@ -636,7 +635,7 @@ internal sealed partial class PenToolViewModel : Bindable, IDisposable
             var layer = Layers[i];
             if (string.IsNullOrEmpty(layer.Name) || regex.IsMatch(layer.Name))
             {
-                layer.Name = $"レイヤー {Layers.Count - i}";
+                layer.Name = $"{Texts.LayerDefaultName} {Layers.Count - i}";
             }
         }
     }

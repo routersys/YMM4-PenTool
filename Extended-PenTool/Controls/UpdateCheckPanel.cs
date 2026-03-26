@@ -83,13 +83,13 @@ public sealed class UpdateCheckPanel : UserControl, IPropertyEditorControl
             if (latestVersion == ignoredVersion) return;
 
             var message =
-                $"新しいバージョンのPenToolプラグインが利用可能です。\n\n" +
-                $"現在のバージョン: v{CurrentVersion}\n" +
-                $"最新バージョン: v{latestVersion}\n\n" +
-                $"ダウンロードページを開きますか？\n\n" +
-                $"（「いいえ」を選択すると、このバージョン(v{latestVersion})の通知は表示されなくなります）";
+                $"{Texts.UpdateAvailableMessageLine1}\n\n" +
+                $"{Texts.CurrentVersionLabel}: v{CurrentVersion}\n" +
+                $"{Texts.LatestVersionLabel}: v{latestVersion}\n\n" +
+                $"{Texts.OpenDownloadPageQuestion}\n\n" +
+                string.Format(Texts.IgnoreVersionNotice, latestVersion);
 
-            var result = MessageBox.Show(message, "ExtendedPenTool - 更新通知",
+            var result = MessageBox.Show(message, Texts.UpdateDialogTitle,
                 MessageBoxButton.YesNo, MessageBoxImage.Information);
 
             if (result == MessageBoxResult.Yes)

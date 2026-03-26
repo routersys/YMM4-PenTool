@@ -78,6 +78,8 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Extended-PenTool.SourceGenerator\Extended-PenTool.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+		<ProjectReference Include="..\YukkuriMovieMaker.Generator\YukkuriMovieMaker.Generator\YukkuriMovieMaker.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+		<AdditionalFiles Include="**\*.csv" />
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
