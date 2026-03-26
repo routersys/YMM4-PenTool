@@ -23,6 +23,8 @@ namespace ExtendedPenTool.ViewModels;
 
 internal sealed class PenToolViewModel : Bindable, IDisposable
 {
+    private static readonly Regex DefaultLayerNamePattern = new($"^{Regex.Escape(Texts.LayerNamePrefix)}\\d+$");
+
     private readonly ServiceRegistry registry = new();
     private readonly IHistoryService historyService;
     private readonly ILayerService layerService;
@@ -629,11 +631,10 @@ internal sealed class PenToolViewModel : Bindable, IDisposable
 
     private void RenumberLayers()
     {
-        var regex = new Regex($"^{Regex.Escape(Texts.LayerNamePrefix)}\\d+$");
         for (var i = 0; i < Layers.Count; i++)
         {
             var layer = Layers[i];
-            if (string.IsNullOrEmpty(layer.Name) || regex.IsMatch(layer.Name))
+            if (string.IsNullOrEmpty(layer.Name) || DefaultLayerNamePattern.IsMatch(layer.Name))
             {
                 layer.Name = string.Format(Texts.LayerNameFormat, Layers.Count - i);
             }
