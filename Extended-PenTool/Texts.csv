@@ -19,7 +19,7 @@ MenuView,Menu: View,表示(_V),View(_V),视图(_V),檢視(_V),보기(_V),Ver(_V)
 MenuCanvas,Menu: Canvas,キャンバス,Canvas,画布,畫布,캔버스,Lienzo,لوحة الرسم,Kanvas,
 MenuLayer,Menu: Layer,レイヤー,Layer,图层,圖層,레이어,Capa,طبقة,Layer,
 MenuCanvasControl,Menu: Canvas control,キャンバス操作,Canvas Controls,画布操作,畫布操作,캔버스 조작,Controles de lienzo,عناصر تحكم اللوحة,Kontrol Kanvas,
-MenuHistory,Menu: History,履歴管理,History,History,歷史記錄,기록,Historial,السجل,Riwayat,
+MenuHistory,Menu: History,履歴管理,History,历史记录,歷史記錄,기록,Historial,السجل,Riwayat,
 MenuSettings,Menu: Settings,設定(_S),Settings(_S),设置(_S),設定(_S),설정(_S),Configuración(_S),الإعدادات(_S),Pengaturan(_S),
 MenuMouseWheelAction,Menu: mouse wheel action,マウスホイールの動作,Mouse Wheel Action,鼠标滚轮操作,滑鼠滾輪動作,마우스 휠 동작,Acción de la rueda del ratón,إجراء عجلة الفأرة,Aksi Roda Mouse,
 MenuMouseWheelZoom,Menu: mouse wheel zoom,キャンバスの拡大・縮小,Canvas Zoom,画布缩放,畫布縮放,캔버스 확대/축소,Zoom del lienzo,تكبير/تصغير اللوحة,Zoom Kanvas,

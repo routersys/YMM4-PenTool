@@ -9,7 +9,6 @@ using ExtendedPenTool.Settings;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Ink;
@@ -32,7 +31,12 @@ internal sealed partial class PenToolViewModel : Bindable, IDisposable
     private bool isFilteringSelection;
     private bool disposed;
 
-    private static Regex DefaultLayerNamePattern() => new($"^{Regex.Escape(Texts.LayerDefaultName)} \\d+$");
+    private static bool IsDefaultLayerName(string name)
+    {
+        var prefix = $"{Texts.LayerDefaultName} ";
+        if (!name.StartsWith(prefix, StringComparison.Ordinal)) return false;
+        return int.TryParse(name[prefix.Length..], out _);
+    }
 
     public ObservableCollection<HistoryItem> History => historyService.Items;
     public ObservableCollection<Layer> Layers => layerService.Layers;
@@ -629,11 +633,10 @@ internal sealed partial class PenToolViewModel : Bindable, IDisposable
 
     private void RenumberLayers()
     {
-        var regex = DefaultLayerNamePattern();
         for (var i = 0; i < Layers.Count; i++)
         {
             var layer = Layers[i];
-            if (string.IsNullOrEmpty(layer.Name) || regex.IsMatch(layer.Name))
+            if (string.IsNullOrEmpty(layer.Name) || IsDefaultLayerName(layer.Name))
             {
                 layer.Name = $"{Texts.LayerDefaultName} {Layers.Count - i}";
             }
