@@ -1,3 +1,4 @@
+using ExtendedPenTool.Localization;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
@@ -5,42 +6,43 @@ using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text.Json;
 using System.Windows;
-using System.Windows.Controls;
-using YukkuriMovieMaker.Commons;
-using ExtendedPenTool.Localization;
 
-namespace ExtendedPenTool.Controls;
+namespace ExtendedPenTool.Services;
 
-public sealed class UpdateCheckPanel : UserControl, IPropertyEditorControl
+public static class UpdateCheckService
 {
     private static bool updateCheckCompleted;
     private static readonly HttpClient httpClient = new();
-    private static string settingsFilePath = "";
-    private static string ignoredVersion = "";
-    private const string CurrentVersion = "3.0.0";
+    private static string settingsFilePath = string.Empty;
+    private static string ignoredVersion = string.Empty;
+    private static readonly string CurrentVersion = GetCurrentVersion();
     private const string RepoUrl = "https://api.github.com/repos/routersys/YMM4-PenTool/releases/latest";
     private const string ReleasesUrl = "https://github.com/routersys/YMM4-PenTool/releases/latest";
 
-#pragma warning disable CS0067
-    public event EventHandler? BeginEdit;
-    public event EventHandler? EndEdit;
-#pragma warning restore CS0067
-
-    public UpdateCheckPanel()
+    private static string GetCurrentVersion()
     {
-        Visibility = Visibility.Collapsed;
-        Loaded += OnLoaded;
+        try
+        {
+            var version = Assembly.GetExecutingAssembly().GetName().Version;
+            return version is not null
+                ? $"{Math.Max(0, version.Major)}.{Math.Max(0, version.Minor)}.{Math.Max(0, version.Build)}"
+                : "1.0.0";
+        }
+        catch
+        {
+            return "1.0.0";
+        }
+    }
 
+    static UpdateCheckService()
+    {
         if (httpClient.DefaultRequestHeaders.UserAgent.Count == 0)
         {
             httpClient.DefaultRequestHeaders.UserAgent.Add(
                 new ProductInfoHeaderValue("YMM4-ExtendedPenTool", CurrentVersion));
         }
 
-        if (string.IsNullOrEmpty(settingsFilePath))
-        {
-            InitializeSettingsPath();
-        }
+        InitializeSettingsPath();
     }
 
     private static void InitializeSettingsPath()
@@ -48,7 +50,7 @@ public sealed class UpdateCheckPanel : UserControl, IPropertyEditorControl
         try
         {
             var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            if (dir is not null)
+            if (!string.IsNullOrEmpty(dir))
             {
                 settingsFilePath = Path.Combine(dir, "ExtendedPenToolSettings.json");
                 LoadSettings();
@@ -59,10 +61,7 @@ public sealed class UpdateCheckPanel : UserControl, IPropertyEditorControl
         }
     }
 
-    private async void OnLoaded(object sender, RoutedEventArgs e) =>
-        await CheckForUpdatesAsync();
-
-    private static async Task CheckForUpdatesAsync()
+    public static async Task CheckForUpdatesAsync()
     {
         if (updateCheckCompleted) return;
         updateCheckCompleted = true;
@@ -77,14 +76,13 @@ public sealed class UpdateCheckPanel : UserControl, IPropertyEditorControl
 
             if (!jsonDoc.RootElement.TryGetProperty("tag_name", out var tagElement)) return;
 
-            var tag = tagElement.GetString() ?? "";
+            var tag = tagElement.GetString() ?? string.Empty;
             var latestVersion = tag.StartsWith('v') ? tag[1..] : tag;
 
             if (!IsNewVersionAvailable(CurrentVersion, latestVersion)) return;
             if (latestVersion == ignoredVersion) return;
 
-            var message =
-                string.Format(Texts.UpdateNotificationMessage, CurrentVersion, latestVersion);
+            var message = string.Format(Texts.UpdateNotificationMessage, CurrentVersion, latestVersion);
 
             var result = MessageBox.Show(message, Texts.UpdateNotificationTitle,
                 MessageBoxButton.YesNo, MessageBoxImage.Information);
@@ -108,14 +106,20 @@ public sealed class UpdateCheckPanel : UserControl, IPropertyEditorControl
     {
         try
         {
+            if (Version.TryParse(current, out var currentVersion) &&
+                Version.TryParse(latest, out var latestVersion))
+            {
+                return latestVersion > currentVersion;
+            }
+
             var currentParts = current.Split('.');
             var latestParts = latest.Split('.');
             var length = Math.Max(currentParts.Length, latestParts.Length);
 
             for (var i = 0; i < length; i++)
             {
-                var c = i < currentParts.Length ? int.Parse(currentParts[i]) : 0;
-                var l = i < latestParts.Length ? int.Parse(latestParts[i]) : 0;
+                var c = i < currentParts.Length && int.TryParse(currentParts[i], out var cVal) ? cVal : 0;
+                var l = i < latestParts.Length && int.TryParse(latestParts[i], out var lVal) ? lVal : 0;
                 if (l > c) return true;
                 if (l < c) return false;
             }
@@ -130,12 +134,13 @@ public sealed class UpdateCheckPanel : UserControl, IPropertyEditorControl
 
     private sealed class PluginSettings
     {
-        public string IgnoredVersion { get; set; } = "";
+        public string IgnoredVersion { get; set; } = string.Empty;
     }
 
     private static void LoadSettings()
     {
-        if (!File.Exists(settingsFilePath)) return;
+        if (string.IsNullOrEmpty(settingsFilePath) || !File.Exists(settingsFilePath)) return;
+
         try
         {
             var json = File.ReadAllText(settingsFilePath);
@@ -152,6 +157,8 @@ public sealed class UpdateCheckPanel : UserControl, IPropertyEditorControl
 
     private static void SaveSettings()
     {
+        if (string.IsNullOrEmpty(settingsFilePath)) return;
+
         try
         {
             var settings = new PluginSettings { IgnoredVersion = ignoredVersion };

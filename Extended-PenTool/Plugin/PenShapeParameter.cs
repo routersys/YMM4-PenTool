@@ -35,10 +35,6 @@ internal sealed class PenShapeParameter : ShapeParameterBase
     public bool IsEditing { get => isEditing; set => Set(ref isEditing, value); }
     private bool isEditing;
 
-    [Display(GroupName = "Version Check Only", Name = "", Order = -1)]
-    [UpdateCheckPanelEditor]
-    public bool UpdateCheckPlaceholder { get; set; }
-
     public PenShapeParameter() { }
     public PenShapeParameter(SharedDataStore? sharedData) : base(sharedData) { }
 

@@ -1,5 +1,6 @@
 using ExtendedPenTool.Models;
 using ExtendedPenTool.Plugin;
+using ExtendedPenTool.Services;
 using ExtendedPenTool.ViewModels;
 using ExtendedPenTool.Views;
 using System.Collections.Immutable;
@@ -18,7 +19,11 @@ public partial class OpenPenToolButton : UserControl, IPropertyEditorControl2
 
     public void SetEditorInfo(IEditorInfo info) => editorInfo = info;
 
-    public OpenPenToolButton() => InitializeComponent();
+    public OpenPenToolButton()
+    {
+        InitializeComponent();
+        Loaded += static async (s, e) => await UpdateCheckService.CheckForUpdatesAsync();
+    }
 
     private void Button_Click(object sender, RoutedEventArgs e)
     {
