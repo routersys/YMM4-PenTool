@@ -1,13 +1,14 @@
 using System.Windows.Ink;
 using System.Windows.Media.Imaging;
 using YukkuriMovieMaker.Commons;
+using ExtendedPenTool.Localization;
 
 namespace ExtendedPenTool.Models;
 
 internal sealed class Layer : Bindable
 {
     public string Name { get => name; set => Set(ref name, value); }
-    private string name = "新規レイヤー";
+    private string name = Texts.NewLayerName;
 
     public bool IsVisible { get => isVisible; set => Set(ref isVisible, value); }
     private bool isVisible = true;

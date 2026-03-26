@@ -11,12 +11,13 @@
         xmlns:converters="clr-namespace:ExtendedPenTool.Converters"
         xmlns:views="clr-namespace:ExtendedPenTool.Views"
         xmlns:controls="clr-namespace:YukkuriMovieMaker.Controls;assembly=YukkuriMovieMaker.Controls"
+        xmlns:loc="clr-namespace:ExtendedPenTool.Localization"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
-        Title="拡張ペンツール"
+        Title="{x:Static loc:Texts.PluginName}"
         d:DataContext="{d:DesignInstance Type={x:Type vm:PenToolViewModel}}">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
@@ -260,22 +261,22 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="{Binding Title, RelativeSource={RelativeSource AncestorType=Window}}" VerticalAlignment="Center" Margin="10,0,0,0" Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" MouseLeftButtonDown="ProtectedArea_MouseLeftButtonDown"/>
                 <Menu Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Background="Transparent" Margin="10,0,0,0" MouseLeftButtonDown="ProtectedArea_MouseLeftButtonDown">
-                    <MenuItem Header="表示(_V)">
-                        <MenuItem Header="キャンバス" IsChecked="{Binding IsCanvasVisible, Mode=TwoWay}" IsCheckable="True"/>
-                        <MenuItem Header="レイヤー" IsChecked="{Binding IsLayersVisible, Mode=TwoWay}" IsCheckable="True"/>
-                        <MenuItem Header="キャンバス操作" IsChecked="{Binding IsCanvasControlPanelVisible, Mode=TwoWay}" IsCheckable="True"/>
-                        <MenuItem Header="履歴管理" IsChecked="{Binding IsHistoryVisible, Mode=TwoWay}" IsCheckable="True"/>
+                    <MenuItem Header="{x:Static loc:Texts.MenuView}">
+                        <MenuItem Header="{x:Static loc:Texts.PanelCanvas}" IsChecked="{Binding IsCanvasVisible, Mode=TwoWay}" IsCheckable="True"/>
+                        <MenuItem Header="{x:Static loc:Texts.PanelLayers}" IsChecked="{Binding IsLayersVisible, Mode=TwoWay}" IsCheckable="True"/>
+                        <MenuItem Header="{x:Static loc:Texts.PanelCanvasControls}" IsChecked="{Binding IsCanvasControlPanelVisible, Mode=TwoWay}" IsCheckable="True"/>
+                        <MenuItem Header="{x:Static loc:Texts.PanelHistory}" IsChecked="{Binding IsHistoryVisible, Mode=TwoWay}" IsCheckable="True"/>
                     </MenuItem>
-                    <MenuItem Header="設定(_S)">
-                        <MenuItem Header="マウスホイールの動作">
-                            <MenuItem Header="キャンバスの拡大・縮小" IsCheckable="True" IsChecked="{Binding Source={x:Static settings:PenSettings.Default}, Path=MouseWheelAction, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static enums:MouseWheelAction.Zoom}}"/>
-                            <MenuItem Header="ペンサイズの変更" IsCheckable="True" IsChecked="{Binding Source={x:Static settings:PenSettings.Default}, Path=MouseWheelAction, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static enums:MouseWheelAction.PenSize}}"/>
+                    <MenuItem Header="{x:Static loc:Texts.MenuSettings}">
+                        <MenuItem Header="{x:Static loc:Texts.MouseWheelAction}">
+                            <MenuItem Header="{x:Static loc:Texts.MouseWheelZoomCanvas}" IsCheckable="True" IsChecked="{Binding Source={x:Static settings:PenSettings.Default}, Path=MouseWheelAction, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static enums:MouseWheelAction.Zoom}}"/>
+                            <MenuItem Header="{x:Static loc:Texts.MouseWheelPenSize}" IsCheckable="True" IsChecked="{Binding Source={x:Static settings:PenSettings.Default}, Path=MouseWheelAction, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static enums:MouseWheelAction.PenSize}}"/>
                         </MenuItem>
-                        <MenuItem Header="ツールバーのレイアウト">
-                            <MenuItem Header="上" IsCheckable="True" IsChecked="{Binding ToolbarLayout, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static enums:ToolbarLayout.Top}}"/>
-                            <MenuItem Header="下" IsCheckable="True" IsChecked="{Binding ToolbarLayout, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static enums:ToolbarLayout.Bottom}}"/>
-                            <MenuItem Header="左" IsCheckable="True" IsChecked="{Binding ToolbarLayout, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static enums:ToolbarLayout.Left}}"/>
-                            <MenuItem Header="右" IsCheckable="True" IsChecked="{Binding ToolbarLayout, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static enums:ToolbarLayout.Right}}"/>
+                        <MenuItem Header="{x:Static loc:Texts.ToolbarLayout}">
+                            <MenuItem Header="{x:Static loc:Texts.DirectionTop}" IsCheckable="True" IsChecked="{Binding ToolbarLayout, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static enums:ToolbarLayout.Top}}"/>
+                            <MenuItem Header="{x:Static loc:Texts.DirectionBottom}" IsCheckable="True" IsChecked="{Binding ToolbarLayout, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static enums:ToolbarLayout.Bottom}}"/>
+                            <MenuItem Header="{x:Static loc:Texts.DirectionLeft}" IsCheckable="True" IsChecked="{Binding ToolbarLayout, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static enums:ToolbarLayout.Left}}"/>
+                            <MenuItem Header="{x:Static loc:Texts.DirectionRight}" IsCheckable="True" IsChecked="{Binding ToolbarLayout, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static enums:ToolbarLayout.Right}}"/>
                         </MenuItem>
                     </MenuItem>
                 </Menu>
@@ -290,7 +291,7 @@
             </Grid>
 
             <Border DockPanel.Dock="Bottom" BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" BorderThickness="0,1,0,0" Padding="4">
-                <Button Content="閉じる" Width="100" HorizontalAlignment="Right" Click="CloseButton_Click"/>
+                <Button Content="{x:Static loc:Texts.Close}" Width="100" HorizontalAlignment="Right" Click="CloseButton_Click"/>
             </Border>
 
             <DockPanel>
@@ -330,36 +331,36 @@
                             </Style>
                         </StackPanel.Style>
 
-                        <RadioButton ToolTip="ペン (右クリックで設定)" IsChecked="{Binding SelectedBrushType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static brush:BrushType.Pen}}" GroupName="ToolSelection">
+                        <RadioButton ToolTip="{x:Static loc:Texts.TooltipPen}" IsChecked="{Binding SelectedBrushType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static brush:BrushType.Pen}}" GroupName="ToolSelection">
                             <Path Style="{StaticResource IconPathStyle}" Data="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
                             <RadioButton.ContextMenu>
                                 <ContextMenu>
-                                    <MenuItem Header="筆圧" IsCheckable="True" IsChecked="{Binding Source={x:Static settings:PenSettings.Default}, Path=PenStyle.IsPressure, Mode=TwoWay}"/>
+                                    <MenuItem Header="{x:Static loc:Texts.Pressure}" IsCheckable="True" IsChecked="{Binding Source={x:Static settings:PenSettings.Default}, Path=PenStyle.IsPressure, Mode=TwoWay}"/>
                                 </ContextMenu>
                             </RadioButton.ContextMenu>
                         </RadioButton>
-                        <RadioButton ToolTip="マーカー (右クリックで設定)" IsChecked="{Binding SelectedBrushType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static brush:BrushType.Highlighter}}" GroupName="ToolSelection">
+                        <RadioButton ToolTip="{x:Static loc:Texts.TooltipHighlighter}" IsChecked="{Binding SelectedBrushType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static brush:BrushType.Highlighter}}" GroupName="ToolSelection">
                             <Path Style="{StaticResource IconPathStyle}" Data="M18.5,1.71L22.29,5.5L20.29,7.5L16.5,3.71L18.5,1.71M2,17V21H6L15.88,11.12L11.88,7.12L2,17Z"/>
                             <RadioButton.ContextMenu>
                                 <ContextMenu>
-                                    <MenuItem Header="筆圧" IsCheckable="True" IsChecked="{Binding Source={x:Static settings:PenSettings.Default}, Path=HighlighterStyle.IsPressure, Mode=TwoWay}"/>
+                                    <MenuItem Header="{x:Static loc:Texts.Pressure}" IsCheckable="True" IsChecked="{Binding Source={x:Static settings:PenSettings.Default}, Path=HighlighterStyle.IsPressure, Mode=TwoWay}"/>
                                 </ContextMenu>
                             </RadioButton.ContextMenu>
                         </RadioButton>
-                        <RadioButton ToolTip="鉛筆 (右クリックで設定)" IsChecked="{Binding SelectedBrushType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static brush:BrushType.Pencil}}" GroupName="ToolSelection">
+                        <RadioButton ToolTip="{x:Static loc:Texts.TooltipPencil}" IsChecked="{Binding SelectedBrushType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static brush:BrushType.Pencil}}" GroupName="ToolSelection">
                             <Path Style="{StaticResource IconPathStyle}" Data="M14.06,9L15,9.94L5.92,19H5V18.08L14.06,9M17.66,3C17.41,3 17.15,3.1 16.96,3.29L15.13,5.12L18.88,8.87L20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18.17,3.09 17.92,3 17.66,3M14.06,6.19L3,17.25V21H6.75L17.81,9.94L14.06,6.19Z"/>
                             <RadioButton.ContextMenu>
                                 <ContextMenu>
-                                    <MenuItem Header="筆圧" IsCheckable="True" IsChecked="{Binding Source={x:Static settings:PenSettings.Default}, Path=PencilStyle.IsPressure, Mode=TwoWay}"/>
+                                    <MenuItem Header="{x:Static loc:Texts.Pressure}" IsCheckable="True" IsChecked="{Binding Source={x:Static settings:PenSettings.Default}, Path=PencilStyle.IsPressure, Mode=TwoWay}"/>
                                 </ContextMenu>
                             </RadioButton.ContextMenu>
                         </RadioButton>
-                        <RadioButton ToolTip="消しゴム (右クリックでモード切替)" IsChecked="{Binding SelectedBrushType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static brush:BrushType.Eraser}}" GroupName="ToolSelection">
+                        <RadioButton ToolTip="{x:Static loc:Texts.TooltipEraser}" IsChecked="{Binding SelectedBrushType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static brush:BrushType.Eraser}}" GroupName="ToolSelection">
                             <Path Style="{StaticResource IconPathStyle}" Data="M16.24,3.56L21.19,8.5C21.97,9.29 21.97,10.55 21.19,11.34L12,20.53C10.44,22.09 7.91,22.09 6.34,20.53L2.81,17C2.03,16.21 2.03,14.95 2.81,14.16L13.41,3.56C14.2,2.78 15.46,2.78 16.24,3.56M4.22,15.58L7.76,19.11C8.54,19.9 9.8,19.9 10.59,19.11L14.12,15.58L9.17,10.63L4.22,15.58Z"/>
                             <RadioButton.ContextMenu>
                                 <ContextMenu>
-                                    <MenuItem Header="ポイント消し" IsChecked="{Binding Source={x:Static settings:PenSettings.Default}, Path=EraserStyle.Mode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static enums:EraserMode.Point}}" Command="{Binding SwitchEraserModeCommand}" CommandParameter="{x:Static enums:EraserMode.Point}"/>
-                                    <MenuItem Header="ストローク消し" IsChecked="{Binding Source={x:Static settings:PenSettings.Default}, Path=EraserStyle.Mode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static enums:EraserMode.Line}}" Command="{Binding SwitchEraserModeCommand}" CommandParameter="{x:Static enums:EraserMode.Line}"/>
+                                    <MenuItem Header="{x:Static loc:Texts.EraserPoint}" IsChecked="{Binding Source={x:Static settings:PenSettings.Default}, Path=EraserStyle.Mode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static enums:EraserMode.Point}}" Command="{Binding SwitchEraserModeCommand}" CommandParameter="{x:Static enums:EraserMode.Point}"/>
+                                    <MenuItem Header="{x:Static loc:Texts.EraserStroke}" IsChecked="{Binding Source={x:Static settings:PenSettings.Default}, Path=EraserStyle.Mode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static enums:EraserMode.Line}}" Command="{Binding SwitchEraserModeCommand}" CommandParameter="{x:Static enums:EraserMode.Line}"/>
                                 </ContextMenu>
                             </RadioButton.ContextMenu>
                         </RadioButton>
@@ -379,13 +380,13 @@
                             </Separator.Style>
                         </Separator>
 
-                        <RadioButton ToolTip="選択" IsChecked="{Binding IsSelectMode, Mode=TwoWay}" GroupName="ToolSelection">
+                        <RadioButton ToolTip="{x:Static loc:Texts.Select}" IsChecked="{Binding IsSelectMode, Mode=TwoWay}" GroupName="ToolSelection">
                             <Path Style="{StaticResource IconPathStyle}" Data="M15,3H17V5H15M15,19H17V21H15M3,11H5V13H3M3,15H5V17H3M3,7H5V9H3M3,3H5V5H3M7,3H9V5H7M19,15H21V17H19M11,3H13V5H11M19,7H21V9H19M19,11H21V13H19M19,3H21V5H19M7,19H9V21H7M11,19H13V21H11M19,19H21V21H19M3,19H5V21H3Z"/>
                         </RadioButton>
-                        <RepeatButton ToolTip="元に戻す (Ctrl+Z)" Command="{Binding UndoCommand}">
+                        <RepeatButton ToolTip="{x:Static loc:Texts.Undo}" Command="{Binding UndoCommand}">
                             <Path Style="{StaticResource IconPathStyle}" Data="M12.5,8C9.85,8 7.45,9.16 5.86,11L3,8V16H11L7.91,12.91C9.13,11.55 10.71,10.75 12.5,10.75C15.61,10.75 18.22,12.89 19.02,15.75L21.5,15C20.42,11.13 16.81,8 12.5,8Z"/>
                         </RepeatButton>
-                        <RepeatButton ToolTip="やり直し (Ctrl+Y)" Command="{Binding RedoCommand}">
+                        <RepeatButton ToolTip="{x:Static loc:Texts.Redo}" Command="{Binding RedoCommand}">
                             <Path Style="{StaticResource IconPathStyle}" Data="M18.4,10.6C16.55,8.99 14.15,8 11.5,8C6.85,8 2.92,11.03 1.54,15.22L3.9,16C4.95,12.81 7.95,10.5 11.5,10.5C13.45,10.5 15.23,11.22 16.62,12.38L13,16H22V7L18.4,10.6Z"/>
                         </RepeatButton>
 
@@ -474,15 +475,15 @@
                             </Separator.Style>
                         </Separator>
 
-                        <Button ToolTip="インポート" Command="{Binding ImportIsfCommand}">
+                        <Button ToolTip="{x:Static loc:Texts.Import}" Command="{Binding ImportIsfCommand}">
                             <Path Style="{StaticResource IconPathStyle}" Data="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z"/>
                         </Button>
-                        <controls:DropDownButton ToolTip="エクスポート">
+                        <controls:DropDownButton ToolTip="{x:Static loc:Texts.Export}">
                             <Path Style="{StaticResource IconPathStyle}" Data="M5,20H19V18H5M9,16H15V10H19L12,3L5,10H9V16Z"/>
                             <controls:DropDownButton.ContextMenu>
                                 <ContextMenu DataContext="{Binding RelativeSource={RelativeSource Mode=Self},Path=PlacementTarget.DataContext}" d:DataContext="{d:DesignInstance Type={x:Type vm:PenToolViewModel}}">
-                                    <MenuItem Header="画像として保存" Command="{Binding SaveImageCommand}"/>
-                                    <MenuItem Header="ISF形式でエクスポート" Command="{Binding ExportIsfCommand}"/>
+                                    <MenuItem Header="{x:Static loc:Texts.SaveAsImage}" Command="{Binding SaveImageCommand}"/>
+                                    <MenuItem Header="{x:Static loc:Texts.ExportAsIsf}" Command="{Binding ExportIsfCommand}"/>
                                 </ContextMenu>
                             </controls:DropDownButton.ContextMenu>
                         </controls:DropDownButton>
@@ -490,7 +491,7 @@
                 </Border>
 
                 <Canvas x:Name="MainCanvas" ClipToBounds="True">
-                    <ContentControl x:Name="CanvasPanel" Style="{StaticResource DraggablePanelStyle}" Tag="キャンバス" MinWidth="200" MinHeight="150" Visibility="{Binding IsCanvasVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <ContentControl x:Name="CanvasPanel" Style="{StaticResource DraggablePanelStyle}" Tag="{x:Static loc:Texts.PanelCanvas}" MinWidth="200" MinHeight="150" Visibility="{Binding IsCanvasVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <Canvas x:Name="CanvasViewport" ClipToBounds="True" Background="Transparent" PreviewMouseWheel="CanvasViewport_PreviewMouseWheel" PreviewMouseDown="CanvasViewport_PreviewMouseDown" PreviewMouseMove="CanvasViewport_PreviewMouseMove" MouseUp="CanvasViewport_MouseUp" MouseEnter="CanvasViewport_MouseEnter" MouseLeave="CanvasViewport_MouseLeave">
                             <Grid x:Name="CanvasRoot" Width="{Binding CanvasSize.Width}" Height="{Binding CanvasSize.Height}" RenderTransformOrigin="0.5, 0.5">
                                 <Grid.RenderTransform>
@@ -508,7 +509,7 @@
                         </Canvas>
                     </ContentControl>
 
-                    <ContentControl x:Name="LayersPanel" Style="{StaticResource DraggablePanelStyle}" Tag="レイヤー" MinWidth="200" MinHeight="200" Visibility="{Binding IsLayersVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <ContentControl x:Name="LayersPanel" Style="{StaticResource DraggablePanelStyle}" Tag="{x:Static loc:Texts.PanelLayers}" MinWidth="200" MinHeight="200" Visibility="{Binding IsLayersVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
@@ -564,7 +565,7 @@
                                                     </Border>
                                                     <TextBox Grid.Column="2" Text="{Binding Name}" Margin="5,0" VerticalAlignment="Center" BorderThickness="0" Background="Transparent" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ListViewItem}}" MouseDoubleClick="LayerNameTextBox_MouseDoubleClick" IsReadOnly="True" LostFocus="LayerNameTextBox_LostFocus" PreviewKeyDown="LayerNameTextBox_PreviewKeyDown"/>
                                                     <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
-                                                        <TextBlock Text="ロック" Visibility="{Binding IsLocked, Converter={StaticResource BooleanToVisibilityConverter}}" VerticalAlignment="Center"/>
+                                                        <TextBlock Text="{x:Static loc:Texts.Locked}" Visibility="{Binding IsLocked, Converter={StaticResource BooleanToVisibilityConverter}}" VerticalAlignment="Center"/>
                                                         <TextBlock Text="{Binding Opacity, StringFormat=P0}" Margin="5,0" VerticalAlignment="Center"/>
                                                     </StackPanel>
                                                     <Button Grid.Column="4" Content="&#x22EE;" FontFamily="Segoe UI Symbol" Background="Transparent" BorderThickness="0" VerticalAlignment="Center" Command="{Binding DataContext.ShowLayerPropertiesCommand, RelativeSource={RelativeSource AncestorType=ListView}}" CommandParameter="{Binding}">
@@ -586,27 +587,27 @@
                                 </ListView.ItemTemplate>
                             </ListView>
                             <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
-                                <Button Style="{StaticResource LayerOperationButtonStyle}" ToolTip="レイヤーを追加" Command="{Binding AddLayerCommand}">
+                                <Button Style="{StaticResource LayerOperationButtonStyle}" ToolTip="{x:Static loc:Texts.AddLayer}" Command="{Binding AddLayerCommand}">
                                     <Path Style="{StaticResource IconPathStyle}" Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/>
                                 </Button>
-                                <Button Style="{StaticResource LayerOperationButtonStyle}" ToolTip="選択中のレイヤーを削除" Command="{Binding RemoveLayerCommand}">
+                                <Button Style="{StaticResource LayerOperationButtonStyle}" ToolTip="{x:Static loc:Texts.RemoveSelectedLayer}" Command="{Binding RemoveLayerCommand}">
                                     <Path Style="{StaticResource IconPathStyle}" Data="M19,13H5V11H19V13Z"/>
                                 </Button>
-                                <Button Style="{StaticResource LayerOperationButtonStyle}" ToolTip="レイヤーを上に移動" Command="{Binding MoveLayerUpCommand}">
+                                <Button Style="{StaticResource LayerOperationButtonStyle}" ToolTip="{x:Static loc:Texts.MoveLayerUp}" Command="{Binding MoveLayerUpCommand}">
                                     <Path Style="{StaticResource IconPathStyle}" Data="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z"/>
                                 </Button>
-                                <Button Style="{StaticResource LayerOperationButtonStyle}" ToolTip="レイヤーを下に移動" Command="{Binding MoveLayerDownCommand}">
+                                <Button Style="{StaticResource LayerOperationButtonStyle}" ToolTip="{x:Static loc:Texts.MoveLayerDown}" Command="{Binding MoveLayerDownCommand}">
                                     <Path Style="{StaticResource IconPathStyle}" Data="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/>
                                 </Button>
                             </StackPanel>
                         </Grid>
                     </ContentControl>
 
-                    <ContentControl x:Name="CanvasControlPanel" Style="{StaticResource DraggablePanelStyle}" Tag="キャンバス操作" MinWidth="200" MinHeight="260" Width="200" Height="260" Visibility="{Binding IsCanvasControlPanelVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <ContentControl x:Name="CanvasControlPanel" Style="{StaticResource DraggablePanelStyle}" Tag="{x:Static loc:Texts.PanelCanvasControls}" MinWidth="200" MinHeight="260" Width="200" Height="260" Visibility="{Binding IsCanvasControlPanelVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <views:CanvasControlPanelView/>
                     </ContentControl>
 
-                    <ContentControl x:Name="HistoryPanel" Style="{StaticResource DraggablePanelStyle}" Tag="履歴管理" MinWidth="150" MinHeight="200" Visibility="{Binding IsHistoryVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <ContentControl x:Name="HistoryPanel" Style="{StaticResource DraggablePanelStyle}" Tag="{x:Static loc:Texts.PanelHistory}" MinWidth="150" MinHeight="200" Visibility="{Binding IsHistoryVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <ListView ItemsSource="{Binding History}" SelectedIndex="{Binding CurrentHistoryIndex, Mode=TwoWay}" BorderThickness="0" HorizontalContentAlignment="Stretch" Background="Transparent">
                             <ListView.ItemTemplate>
                                 <DataTemplate DataType="{x:Type models:HistoryItem}">

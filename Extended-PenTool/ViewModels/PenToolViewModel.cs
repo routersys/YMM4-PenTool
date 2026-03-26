@@ -2,6 +2,7 @@ using ExtendedPenTool.Abstractions;
 using ExtendedPenTool.Brush;
 using ExtendedPenTool.Enums;
 using ExtendedPenTool.Infrastructure;
+using ExtendedPenTool.Localization;
 using ExtendedPenTool.Models;
 using ExtendedPenTool.Plugin;
 using ExtendedPenTool.Services;
@@ -20,7 +21,7 @@ using YukkuriMovieMaker.Commons;
 
 namespace ExtendedPenTool.ViewModels;
 
-internal sealed partial class PenToolViewModel : Bindable, IDisposable
+internal sealed class PenToolViewModel : Bindable, IDisposable
 {
     private readonly ServiceRegistry registry = new();
     private readonly IHistoryService historyService;
@@ -32,9 +33,7 @@ internal sealed partial class PenToolViewModel : Bindable, IDisposable
     private bool isFilteringSelection;
     private bool disposed;
 
-    [GeneratedRegex(@"^レイヤー \d+$")]
-    private static partial Regex DefaultLayerNamePattern();
-
+    
     public ObservableCollection<HistoryItem> History => historyService.Items;
     public ObservableCollection<Layer> Layers => layerService.Layers;
     public StrokeCollection Strokes => layerService.AggregatedStrokes;
@@ -630,13 +629,13 @@ internal sealed partial class PenToolViewModel : Bindable, IDisposable
 
     private void RenumberLayers()
     {
-        var regex = DefaultLayerNamePattern();
+        var regex = new Regex($"^{Regex.Escape(Texts.LayerNamePrefix)}\\d+$");
         for (var i = 0; i < Layers.Count; i++)
         {
             var layer = Layers[i];
             if (string.IsNullOrEmpty(layer.Name) || regex.IsMatch(layer.Name))
             {
-                layer.Name = $"レイヤー {Layers.Count - i}";
+                layer.Name = string.Format(Texts.LayerNameFormat, Layers.Count - i);
             }
         }
     }

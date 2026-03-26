@@ -1,6 +1,7 @@
 using ExtendedPenTool.Brush;
 using ExtendedPenTool.Enums;
 using ExtendedPenTool.Models;
+using ExtendedPenTool.Localization;
 using System.Windows.Media;
 using YukkuriMovieMaker.Plugin;
 
@@ -9,7 +10,7 @@ namespace ExtendedPenTool.Settings;
 internal sealed class PenSettings : SettingsBase<PenSettings>
 {
     public override SettingsCategory Category => SettingsCategory.None;
-    public override string Name => "拡張ペンツール";
+    public override string Name => Texts.PluginName;
     public override bool HasSettingView => false;
     public override object SettingView => throw new NotImplementedException();
 
