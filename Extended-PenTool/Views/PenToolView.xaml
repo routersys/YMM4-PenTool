@@ -22,6 +22,7 @@
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <converters:EnumToBooleanConverter x:Key="EnumToBooleanConverter"/>
         <converters:SelectedToColorConverter x:Key="SelectedToColorConverter"/>
+        <converters:HistoryKindToStringConverter x:Key="HistoryKindToStringConverter"/>
 
         <Style TargetType="ListViewItem">
             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
@@ -609,7 +610,7 @@
                         <ListView ItemsSource="{Binding History}" SelectedIndex="{Binding CurrentHistoryIndex, Mode=TwoWay}" BorderThickness="0" HorizontalContentAlignment="Stretch" Background="Transparent">
                             <ListView.ItemTemplate>
                                 <DataTemplate DataType="{x:Type models:HistoryItem}">
-                                    <TextBlock Text="{Binding Description}" Margin="5" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ListViewItem}}"/>
+                                    <TextBlock Text="{Binding Kind, Converter={StaticResource HistoryKindToStringConverter}}" Margin="5" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ListViewItem}}"/>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
                         </ListView>

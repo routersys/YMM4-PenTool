@@ -1,4 +1,5 @@
 using ExtendedPenTool.Abstractions;
+using ExtendedPenTool.Enums;
 using ExtendedPenTool.Models;
 using System.Collections.ObjectModel;
 
@@ -26,7 +27,7 @@ internal sealed class HistoryService : IHistoryService
 
     public event Action? StateChanged;
 
-    public void Push(string description, Action undo, Action redo)
+    public void Push(HistoryKind kind, Action undo, Action redo)
     {
         for (var i = 0; i < currentIndex; i++)
         {
@@ -34,7 +35,7 @@ internal sealed class HistoryService : IHistoryService
         }
         currentIndex = 0;
 
-        Items.Insert(0, new HistoryItem(description, undo, redo));
+        Items.Insert(0, new HistoryItem(kind, undo, redo));
         RaiseStateChanged();
     }
 

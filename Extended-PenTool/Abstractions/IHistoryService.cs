@@ -1,3 +1,4 @@
+using ExtendedPenTool.Enums;
 using ExtendedPenTool.Models;
 using System.Collections.ObjectModel;
 
@@ -9,7 +10,7 @@ internal interface IHistoryService
     int CurrentIndex { get; set; }
     bool CanUndo { get; }
     bool CanRedo { get; }
-    void Push(string description, Action undo, Action redo);
+    void Push(HistoryKind kind, Action undo, Action redo);
     void Undo();
     void Redo();
     void MoveToState(int targetIndex);

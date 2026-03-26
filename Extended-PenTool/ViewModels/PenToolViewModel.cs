@@ -2,7 +2,6 @@ using ExtendedPenTool.Abstractions;
 using ExtendedPenTool.Brush;
 using ExtendedPenTool.Enums;
 using ExtendedPenTool.Infrastructure;
-using ExtendedPenTool.Localization;
 using ExtendedPenTool.Models;
 using ExtendedPenTool.Plugin;
 using ExtendedPenTool.Services;
@@ -477,15 +476,15 @@ internal sealed partial class PenToolViewModel : Bindable, IDisposable
             }
         };
 
-        var desc = EditingMode switch
+        var kind = EditingMode switch
         {
-            InkCanvasEditingMode.EraseByPoint or InkCanvasEditingMode.EraseByStroke => Texts.EraseAction,
-            InkCanvasEditingMode.Select => Texts.SelectAction,
-            _ => Texts.DrawAction,
+            InkCanvasEditingMode.EraseByPoint or InkCanvasEditingMode.EraseByStroke => HistoryKind.Erase,
+            InkCanvasEditingMode.Select => HistoryKind.Select,
+            _ => HistoryKind.Draw,
         };
 
         isUndoRedoing = true;
-        historyService.Push(desc, undo, redo);
+        historyService.Push(kind, undo, redo);
         isUndoRedoing = false;
         redo();
     }
@@ -530,7 +529,7 @@ internal sealed partial class PenToolViewModel : Bindable, IDisposable
         return originals;
     }
 
-    public void AddTransformUndo(StrokeCollection originalLayerStrokes, StrokeCollection transformedDisplay, string description)
+    public void AddTransformUndo(StrokeCollection originalLayerStrokes, StrokeCollection transformedDisplay, HistoryKind kind)
     {
         if (SelectedLayer is not { } layer) return;
         if (!originalLayerStrokes.All(layer.Strokes.Contains)) return;
@@ -585,7 +584,7 @@ internal sealed partial class PenToolViewModel : Bindable, IDisposable
         };
 
         isUndoRedoing = true;
-        historyService.Push(description, undo, redo);
+        historyService.Push(kind, undo, redo);
         isUndoRedoing = false;
         redo();
     }
@@ -597,7 +596,7 @@ internal sealed partial class PenToolViewModel : Bindable, IDisposable
 
         isUndoRedoing = true;
         historyService.Push(
-            $"'{layer.Name}'の{propertyName}を変更",
+            HistoryKind.LayerProperty,
             () =>
             {
                 isUndoRedoing = true;
@@ -637,7 +636,7 @@ internal sealed partial class PenToolViewModel : Bindable, IDisposable
             var layer = Layers[i];
             if (string.IsNullOrEmpty(layer.Name) || regex.IsMatch(layer.Name))
             {
-                layer.Name = $"{Texts.DefaultLayerPrefix} {Layers.Count - i}";
+                layer.Name = $"レイヤー {Layers.Count - i}";
             }
         }
     }
@@ -683,7 +682,7 @@ internal sealed partial class PenToolViewModel : Bindable, IDisposable
         };
 
         isUndoRedoing = true;
-        historyService.Push(Texts.AddLayerAction, undo, redo);
+        historyService.Push(HistoryKind.AddLayer, undo, redo);
         isUndoRedoing = false;
         redo();
     }
@@ -732,7 +731,7 @@ internal sealed partial class PenToolViewModel : Bindable, IDisposable
         };
 
         isUndoRedoing = true;
-        historyService.Push(Texts.RemoveLayerAction, undo, redo);
+        historyService.Push(HistoryKind.RemoveLayer, undo, redo);
         isUndoRedoing = false;
         redo();
     }
@@ -742,7 +741,7 @@ internal sealed partial class PenToolViewModel : Bindable, IDisposable
         if (oldIndex < 0 || oldIndex >= Layers.Count || newIndex < 0 || newIndex >= Layers.Count) return;
 
         isUndoRedoing = true;
-        historyService.Push(Texts.MoveLayerAction,
+        historyService.Push(HistoryKind.MoveLayer,
             () =>
             {
                 isUndoRedoing = true;

@@ -1,8 +1,10 @@
+using ExtendedPenTool.Enums;
+
 namespace ExtendedPenTool.Models;
 
-internal sealed class HistoryItem(string description, Action undo, Action redo)
+internal sealed class HistoryItem(HistoryKind kind, Action undo, Action redo)
 {
-    public string Description { get; } = description;
+    public HistoryKind Kind { get; } = kind;
     public Action Undo { get; } = undo;
     public Action Redo { get; } = redo;
 }

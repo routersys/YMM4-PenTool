@@ -1,4 +1,5 @@
 using ExtendedPenTool.Brush;
+using ExtendedPenTool.Enums;
 using ExtendedPenTool.Models;
 using ExtendedPenTool.Settings;
 using ExtendedPenTool.ViewModels;
@@ -666,7 +667,7 @@ public partial class PenToolView : Window
     {
         if (originalLayerStrokes is { Count: > 0 } && ViewModel is not null)
         {
-            ViewModel.AddTransformUndo(originalLayerStrokes, inkCanvas.GetSelectedStrokes().Clone(), "移動");
+            ViewModel.AddTransformUndo(originalLayerStrokes, inkCanvas.GetSelectedStrokes().Clone(), HistoryKind.MoveStrokes);
             inkCanvas.Select(new StrokeCollection());
         }
         originalLayerStrokes = null;
@@ -682,7 +683,7 @@ public partial class PenToolView : Window
     {
         if (originalLayerStrokes is { Count: > 0 } && ViewModel is not null)
         {
-            ViewModel.AddTransformUndo(originalLayerStrokes, inkCanvas.GetSelectedStrokes().Clone(), "サイズ変更");
+            ViewModel.AddTransformUndo(originalLayerStrokes, inkCanvas.GetSelectedStrokes().Clone(), HistoryKind.ResizeStrokes);
             inkCanvas.Select(new StrokeCollection());
         }
         originalLayerStrokes = null;
@@ -803,7 +804,7 @@ public partial class PenToolView : Window
         {
             if (origStrokes is { Count: > 0 })
             {
-                viewModel.AddTransformUndo(origStrokes, inkCanvas.GetSelectedStrokes().Clone(), "回転");
+                viewModel.AddTransformUndo(origStrokes, inkCanvas.GetSelectedStrokes().Clone(), HistoryKind.RotateStrokes);
                 inkCanvas.Select(new StrokeCollection());
             }
             origStrokes = null;
